@@ -14,6 +14,8 @@
 		150DD6EE1A6A29DD0082F6B1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 150DD6ED1A6A29DD0082F6B1 /* Images.xcassets */; };
 		150DD6F11A6A29DD0082F6B1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 150DD6EF1A6A29DD0082F6B1 /* LaunchScreen.xib */; };
 		150DD6FD1A6A29DD0082F6B1 /* SkipChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD6FC1A6A29DD0082F6B1 /* SkipChatTests.swift */; };
+		ACB7F2CF1A6ADD83005794F4 /* contagged.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB7F2CE1A6ADD83005794F4 /* contagged.swift */; };
+		ACB7F2D11A6AE21D005794F4 /* SwiftAddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB7F2D01A6AE21D005794F4 /* SwiftAddressBook.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,8 @@
 		150DD6F61A6A29DD0082F6B1 /* SkipChatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkipChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		150DD6FB1A6A29DD0082F6B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		150DD6FC1A6A29DD0082F6B1 /* SkipChatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipChatTests.swift; sourceTree = "<group>"; };
+		ACB7F2CE1A6ADD83005794F4 /* contagged.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = contagged.swift; path = Contagt/contagged.swift; sourceTree = "<group>"; };
+		ACB7F2D01A6AE21D005794F4 /* SwiftAddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftAddressBook.swift; path = Contagt/SwiftAddressBook.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +65,7 @@
 		150DD6D51A6A29DD0082F6B1 = {
 			isa = PBXGroup;
 			children = (
+				ACF79BFA1A6AD806007B071D /* Contagged */,
 				150DD6E01A6A29DD0082F6B1 /* SkipChat */,
 				150DD6F91A6A29DD0082F6B1 /* SkipChatTests */,
 				150DD6DF1A6A29DD0082F6B1 /* Products */,
@@ -113,6 +118,15 @@
 				150DD6FB1A6A29DD0082F6B1 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ACF79BFA1A6AD806007B071D /* Contagged */ = {
+			isa = PBXGroup;
+			children = (
+				ACB7F2CE1A6ADD83005794F4 /* contagged.swift */,
+				ACB7F2D01A6AE21D005794F4 /* SwiftAddressBook.swift */,
+			);
+			name = Contagged;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,6 +229,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACB7F2D11A6AE21D005794F4 /* SwiftAddressBook.swift in Sources */,
+				ACB7F2CF1A6ADD83005794F4 /* contagged.swift in Sources */,
 				150DD6E91A6A29DD0082F6B1 /* ViewController.swift in Sources */,
 				150DD6E71A6A29DD0082F6B1 /* SkipChat.xcdatamodeld in Sources */,
 				150DD6E41A6A29DD0082F6B1 /* AppDelegate.swift in Sources */,
@@ -411,6 +427,7 @@
 				150DD7021A6A29DD0082F6B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		150DD7031A6A29DD0082F6B1 /* Build configuration list for PBXNativeTarget "SkipChatTests" */ = {
 			isa = XCConfigurationList;
@@ -419,6 +436,7 @@
 				150DD7051A6A29DD0082F6B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
