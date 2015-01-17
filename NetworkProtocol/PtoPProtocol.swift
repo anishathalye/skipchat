@@ -198,7 +198,14 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     public func session(session: MCSession!, peer peerID: MCPeerID!, didChangeState state: MCSessionState) {
         // Called when a connected peer changes state (for example, goes offline)
-        println("started session with state ", state)
+        switch (state) {
+            case MCSessionState.NotConnected: println("Session changed state -> not connected")
+            break;
+            case MCSessionState.Connecting: println("Session changed state -> connecting")
+            break;
+            case MCSessionState.Connected: println("Session changed state -> connected")
+            break;
+        }
         
         if state == MCSessionState.Connected {
             var error : NSError?
