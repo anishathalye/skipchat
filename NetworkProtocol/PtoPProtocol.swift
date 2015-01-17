@@ -82,9 +82,7 @@ public class BufferItem {
 
 public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
     let maxBufferLength = 20
-
     let serviceType = "pf-connector"
-//    var assistant : MCAdvertiserAssistant!
     var advertiser : MCNearbyServiceAdvertiser!
     var session : MCSession!
     var peerID: MCPeerID!
@@ -106,9 +104,6 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
         
         self.session = MCSession(peer: peerID)
         self.session.delegate = self
-//        self.assistant = MCAdvertiserAssistant(serviceType:serviceType,
-//            discoveryInfo:nil, session:self.session)
-//        self.assistant.start() // start advertising
         
         self.advertiser = MCNearbyServiceAdvertiser(peer: self.peerID, discoveryInfo: nil, serviceType: serviceType)
         self.advertiser.delegate = self
