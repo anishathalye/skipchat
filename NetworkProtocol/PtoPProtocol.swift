@@ -14,7 +14,7 @@ protocol PtoPProtocolDelegate {
     func receive(message : NSData, pubKey : NSData, time : NSDate)
 }
 
-public class DataPacket : NSCoding {
+public class DataPacket : NSObject, NSCoding {
     var blob : NSData
     var timeToLive : Int
     
