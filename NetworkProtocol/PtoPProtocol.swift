@@ -10,22 +10,52 @@ import Foundation
 import MultipeerConnectivity
 //import CommonCrypto
 
-protocol NetworkProtocolDelegate {
+protocol PtoPProtocolDelegate {
     func receive(message : NSData, pubKey : NSData, time : NSDate)
 }
 
-private class BufferItem{
+public class DataPacket : NSCoding {
     var blob : NSData
-    var timeToLive : UInt
-    var receiveTime : NSDate
-    var hash : NSData?
+    var timeToLive : Int
     
-    public init(msgBlob:NSData, ttl:UInt, rTime:NSDate) {
-        self.blob = msgBlob
+    public init(blob : NSData, ttl : Int) {
+        self.blob = blob
         self.timeToLive = ttl
-        self.receiveTime = rTime
-        
     }
+    
+    class func deserialize(dataInfo : NSData) -> DataPacket {
+        return NSKeyedUnarchiver.unarchiveObjectWithData(dataInfo) as DataPacket
+    }
+    
+    public func serialize() -> NSData {
+        return NSKeyedArchiver.archivedDataWithRootObject(self)
+    }
+    
+    public required init(coder aDecoder: NSCoder) {
+        self.blob = aDecoder.decodeObjectForKey("blob") as NSData
+        self.timeToLive = aDecoder.decodeIntegerForKey("ttl")
+    }
+    
+    public func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeInteger(self.timeToLive, forKey: "ttl")
+        aCoder.encodeObject(self.blob, forKey: "blob")
+    }
+    
+    // returns false if dead
+    public func decrementTTL() -> Bool {
+        return --self.timeToLive > 0
+    }
+}
+
+public class BufferItem {
+    var packetItem : DataPacket
+    var receiveTime : NSDate
+    
+    public init(packet : DataPacket, rTime:NSDate) {
+        self.packetItem = packet
+        self.receiveTime = rTime
+    }
+
     
 //    private func md5: NSData {
 //        let str = self.cStringUsingEncoding(NSUTF8StringEncoding)
@@ -54,11 +84,11 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     var peerID: MCPeerID!
     var browser : MCNearbyServiceBrowser!
     
-    var buffer : [NSData]
+    var buffer : [BufferItem]
     var privateKey : NSData
     var publicKey : NSData
-    var delegate : NetworkProtocolDelegate?
-    
+    var delegate : PtoPProtocolDelegate?
+        
     public init(prKey : NSData, pubKey : NSData) {
         self.buffer = []
         self.privateKey = prKey
@@ -87,21 +117,15 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     // class methods
     public func send(message: NSData, recipient: NSData){
-        var error : NSError?
-        
-//        self.session.sendData(msg, toPeers: self.session.connectedPeers,
-//            withMode: MCSessionSendDataMode.Unreliable, error: &error)
-        
-        if error != nil {
-            print("Error sending data: \(error?.localizedDescription)")
-        }
-
+        var packet = DataPacket(blob: message, ttl: 10) // TODO encrypt
+        var item = BufferItem(packet: packet, rTime: NSDate())
+        self.buffer.append(item)
     }
     
     public func logPeers() {
         var peers = self.session.connectedPeers
         for peer in peers {
-            println("peer %@", peer)
+            println("peer ", peer)
         }
         
     }
@@ -125,6 +149,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     public func session(session: MCSession!, didFinishReceivingResourceWithName resourceName: String!, fromPeer peerID: MCPeerID!, atURL localURL: NSURL!, withError error: NSError!) {
         // Called when a file has finished transferring from another peer
+        println("finished receiving ", resourceName)
     }
     
     
@@ -135,14 +160,20 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     public func session(session: MCSession!, peer peerID: MCPeerID!, didChangeState state: MCSessionState) {
         // Called when a connected peer changes state (for example, goes offline)
-//        if state == MCSessionStateConnecting {
-//            println("received MCSessionStateConnecting for " + peerID.displayName)
-//        } else if state == MCSessionStateConnected {
-//            println("received MCSessionStateConnected for " + peerID.displayName)
-//        } else if state == MCSessionStateNotConnected {
-//            println("received MCSessionStateNotConnected for " + peerID.displayName)
-//        }
-        println("started session with state %@", state)
+        println("started session with state ", state)
+        
+        if state == MCSessionState.Connected {
+            var error : NSError?
+            
+            for item in self.buffer {
+                self.session.sendData(item.packetItem.serialize(), toPeers: [peerID], withMode: MCSessionSendDataMode.Reliable, error: &error)
+                
+                if error != nil {
+                    print("Error sending data: \(error?.localizedDescription)")
+                }
+                error = nil
+            }
+        }
         self.logPeers()
     }
     
@@ -167,6 +198,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     public func browser(browser: MCNearbyServiceBrowser!, foundPeer peerID: MCPeerID!, withDiscoveryInfo info: [NSObject : AnyObject]!) {
         self.browser.invitePeer(peerID, toSession: self.session, withContext: nil, timeout: 30) // what is this constant TODO]
         println("found peer %@", peerID)
+        
     }
     
     public func browser(browser: MCNearbyServiceBrowser!, lostPeer peerID: MCPeerID!) {
