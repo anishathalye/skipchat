@@ -83,7 +83,7 @@ public class BufferItem {
 public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
     let maxBufferLength = 20
 
-    let serviceType = "skipchat-connector"
+    let serviceType = "pf-connector"
 //    var assistant : MCAdvertiserAssistant!
     var advertiser : MCNearbyServiceAdvertiser!
     var session : MCSession!
