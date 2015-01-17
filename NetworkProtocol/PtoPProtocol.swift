@@ -81,7 +81,9 @@ public class BufferItem {
 }
 
 public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
-    let serviceType = "pf-connector"
+    let maxBufferLength = 20
+
+    let serviceType = "skipchat-connector"
 //    var assistant : MCAdvertiserAssistant!
     var advertiser : MCNearbyServiceAdvertiser!
     var session : MCSession!
@@ -178,7 +180,10 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     // trim buffer to desired length
     public func evict() {
-        
+        let remove = buffer.count - maxBufferLength
+        if (remove > 0) {
+            buffer.removeRange(Range(start: 0, end: buffer.count - maxBufferLength))
+        }
     }
     
     public func session(session: MCSession!, didStartReceivingResourceWithName resourceName: String!, fromPeer peerID: MCPeerID!, withProgress progress: NSProgress!) {
