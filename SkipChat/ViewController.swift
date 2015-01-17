@@ -9,10 +9,13 @@
 import UIKit
 
 class ViewController: UIViewController {
+    var networkingLayer : PtoPProtocol?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        self.networkingLayer = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
     }
 
     override func didReceiveMemoryWarning() {
