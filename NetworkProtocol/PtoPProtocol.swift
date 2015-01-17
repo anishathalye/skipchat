@@ -45,6 +45,10 @@ public class DataPacket : NSObject, NSCoding {
     public func decrementTTL() -> Bool {
         return --self.timeToLive > 0
     }
+    
+    public func equalsPacket(other : DataPacket) -> Bool {
+        return self.blob.isEqualToData(other.blob)
+    }
 }
 
 public class BufferItem {
@@ -120,6 +124,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
         var packet = DataPacket(blob: message, ttl: 10) // TODO encrypt
         var item = BufferItem(packet: packet, rTime: NSDate())
         self.buffer.append(item)
+        evict()
     }
     
     public func logPeers() {
@@ -133,14 +138,47 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     // MCSessionDelegate
     public func session(session: MCSession!, didReceiveData data: NSData!, fromPeer peerID: MCPeerID!) {
         // Called when a peer sends an NSData to us
+        println("did receive data")
         
-        // This needs to run on the main queue
-        dispatch_async(dispatch_get_main_queue()) {
-            
-            var msg = NSString(data: data, encoding: NSUTF8StringEncoding)
-            
-//            self.updateChat(msg, fromPeer: peerID)
+//        // This needs to run on the main queue
+//        dispatch_async(dispatch_get_main_queue()) {
+//            
+//            var msg = NSString(data: data, encoding: NSUTF8StringEncoding)
+//            
+//            // self.updateChat(msg, fromPeer: peerID)
+//        }
+
+        var packet = DataPacket.deserialize(data)
+        // check if ours
+        var ours = false
+        
+        if ours {
+            // TODO implement
+        } else {
+            if packet.decrementTTL() {
+                if !inBuffer(packet) {
+                    buffer.append(BufferItem(packet: packet, rTime: NSDate()))
+                    evict()
+                }
+            }
         }
+        
+        println("buffer length: ", buffer.count)
+        
+    }
+    
+    public func inBuffer(packet : DataPacket) -> Bool {
+        for item in self.buffer {
+            if item.packetItem.equalsPacket(packet) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    // trim buffer to desired length
+    public func evict() {
+        
     }
     
     public func session(session: MCSession!, didStartReceivingResourceWithName resourceName: String!, fromPeer peerID: MCPeerID!, withProgress progress: NSProgress!) {
@@ -155,7 +193,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     public func session(session: MCSession!, didReceiveStream stream: NSInputStream!, withName streamName: String!, fromPeer peerID: MCPeerID!) {
         // Called when a peer establishes a stream with us
-
+        println("started receiving stream")
     }
     
     public func session(session: MCSession!, peer peerID: MCPeerID!, didChangeState state: MCSessionState) {
