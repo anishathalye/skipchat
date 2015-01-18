@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate, LGChatControllerDelegate, ContaggedUnknownPersonDelegate, ContaggedPickerDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate, LGChatControllerDelegate {
     let IOS_BAR_HEIGHT : Float = 20.0
     let ROWS_PER_SCREEN : Float = 8.0
     let NAV_BAR_HEIGHT : Float = 64.0
@@ -22,9 +22,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        contaggedManager.viewController = self
-        contaggedManager.unknownPersonDelegate = self
-        contaggedManager.pickerDelegate = self
     }
     
     lazy var managedObjectContext : NSManagedObjectContext? = {
@@ -178,7 +175,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.presentViewController(chatController, animated: true, completion: nil)
     }
     
-    public func composeNewMessage() {
+    internal func composeNewMessage() {
         let chatController = LGChatController()
 //        chatController.opponentImage = UIImage(named: "User")
         chatController.delegate = self
@@ -238,20 +235,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             abort()
         }
         self.fetchMessages()
-    }
-    
-    // ContaggedUnknownPersonDelegate
-    func didResolveToPerson(person: SwiftAddressBookPerson!){
-        println(person.firstName)
-    }
-    
-    // ContaggedPickerDelegate
-    func peoplePickerNavigationControllerDidCancel(){
-        
-    }
-    
-    func personSelected(person: SwiftAddressBookPerson!){
-        println(person.firstName)
     }
 }
 
