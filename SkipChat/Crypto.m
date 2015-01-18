@@ -27,6 +27,10 @@
 
 + (NSString *) stringFromDate:(NSDate *) date;
 
++ (NSData *) dataForKey:(NSString *)key in:(NSData *)data;
+
++ (NSString *) stringForKey:(NSString *)key in:(NSData *)data;
+
 @end
 
 @implementation Crypto
@@ -96,7 +100,7 @@
 }
 
 + (NSData *) sign:(NSData *) message
-             with:(NSData *) privateKey
+             with:(KeyPair *) keyPair
     andEncryptFor:(NSData *) publicKey
 {
     [self maybeSeedRNG];
@@ -106,15 +110,16 @@
 
     // create chunk
     NSMutableDictionary *chunk = [[NSMutableDictionary alloc] init];
-    [chunk setValue:[message base64EncodedStringWithOptions:0] forKey:@"message"];
-    [chunk setValue:[self stringFromDate:[NSDate date]] forKey:@"timestamp"];
-    [chunk setValue:[publicKey base64EncodedStringWithOptions:0] forKey:@"public_key"];
+    [chunk setObject:[message base64EncodedStringWithOptions:0] forKey:@"message"];
+    [chunk setObject:[self stringFromDate:[NSDate date]] forKey:@"timestamp"];
+    [chunk setObject:[keyPair.publicKey base64EncodedStringWithOptions:0] forKey:@"sender_public_key"];
+    [chunk setObject:[publicKey base64EncodedStringWithOptions:0] forKey:@"public_key"];
     NSData *chunkData = [JsonOps dataFromJson:chunk];
 
     // create signature
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256(chunkData.bytes, chunkData.length, hash);
-    NSMutableData *mutPrivateKey = [privateKey mutableCopy];
+    NSMutableData *mutPrivateKey = [keyPair.privateKey mutableCopy];
     bio = BIO_new_mem_buf(mutPrivateKey.mutableBytes, mutPrivateKey.length);
     RSA *rsaPrivateKey = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
     BIO_free_all(bio);
@@ -130,8 +135,8 @@
 
     // create data to be symmetric encrypted
     NSMutableDictionary *symmetricPlaintext = [[NSMutableDictionary alloc] init];
-    [symmetricPlaintext setValue:chunk forKey:@"chunk"];
-    [symmetricPlaintext setValue:signature forKey:@"signature"];
+    [symmetricPlaintext setObject:[chunkData base64EncodedStringWithOptions:0] forKey:@"chunk"];
+    [symmetricPlaintext setObject:[signature base64EncodedStringWithOptions:0] forKey:@"signature"];
     NSData *symmetricPlaintextData = [JsonOps dataFromJson:symmetricPlaintext];
 
     // perform symmetric cipher
@@ -160,8 +165,8 @@
     NSString *ivData = [[NSData dataWithBytes:iv length:sizeof(iv)] base64EncodedStringWithOptions:0];
     NSString *keyData = [[NSData dataWithBytes:key length:sizeof(key)] base64EncodedStringWithOptions:0];
     NSMutableDictionary *symmetricKey = [[NSMutableDictionary alloc] init];
-    [symmetricKey setValue:ivData forKey:@"iv"];
-    [symmetricKey setValue:keyData forKey:@"key"];
+    [symmetricKey setObject:ivData forKey:@"iv"];
+    [symmetricKey setObject:keyData forKey:@"key"];
     NSData *symmetricKeyData = [JsonOps dataFromJson:symmetricKey];
     NSMutableData *mutPublicKey = [publicKey mutableCopy];
     bio = BIO_new_mem_buf(mutPublicKey.mutableBytes, mutPublicKey.length);
@@ -179,18 +184,142 @@
 
     // create blob
     NSMutableDictionary *blob = [[NSMutableDictionary alloc] init];
-    [blob setValue:encryptedKey forKey:@"key_data"];
-    [blob setValue:[symmetricEncrypted base64EncodedStringWithOptions:0] forKey:@"encrypted"];
+    [blob setObject:encryptedKey forKey:@"key_data"];
+    [blob setObject:[symmetricEncrypted base64EncodedStringWithOptions:0] forKey:@"encrypted"];
     return [JsonOps dataFromJson:blob];
 }
 
++ (NSData *) dataForKey:(NSString *)key in:(NSData *)data
+{
+    NSDictionary *json = [JsonOps jsonFromData:data];
+    id object = [json objectForKey:key];
+    if ([object isKindOfClass:[NSString class]]) {
+        NSString *string = object;
+        NSData *data = [[NSData alloc] initWithBase64EncodedString:string options:0];
+        return data;
+    }
+    return nil;
+}
+
++ (NSString *) stringForKey:(NSString *)key in:(NSData *)data
+{
+    NSDictionary *json = [JsonOps jsonFromData:data];
+    id object = [json objectForKey:key];
+    if ([object isKindOfClass:[NSString class]]) {
+        NSString *string = object;
+        return string;
+    }
+    return nil;
+}
+
+#define DECODE_OR_DIE(name, key, data) \
+    NSData *name = [self dataForKey:key in:data]; \
+    if (name == nil) { \
+        NSLog(@"Failed to extract key %@", key); \
+        return NO; \
+    }
+
 + (BOOL) decrypt:(NSData *) blob
-            with:(NSData *) privateKey
+            with:(KeyPair *) keyPair
             into:(NSData **) buffer
             from:(NSData **) publicKey
               at:(NSDate **) date
 {
-    return NO;
+    BIO *bio;
+    unsigned char *buf;
+
+    // unpack blob
+    DECODE_OR_DIE(encryptedKey, @"key_data", blob);
+    DECODE_OR_DIE(encryptedSymmetric, @"encrypted", blob);
+
+    // try to recover the secret key using our private key
+    NSMutableData *mutPrivateKey = [keyPair.privateKey mutableCopy];
+    bio = BIO_new_mem_buf(mutPrivateKey.mutableBytes, mutPrivateKey.length);
+    RSA *rsaPrivateKey = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
+    BIO_free_all(bio);
+    buf = malloc(RSA_size(rsaPrivateKey));
+    int bufLength;
+    if ((bufLength = RSA_private_decrypt(encryptedKey.length, encryptedKey.bytes, buf, rsaPrivateKey, RSA_PKCS1_PADDING)) < 0) {
+        NSLog(@"Failed to decrypt symmetric key");
+        return NO;
+    }
+    NSData *keyData = [NSData dataWithBytes:buf length:bufLength];
+    free(buf);
+
+    // unpack key
+    DECODE_OR_DIE(iv, @"iv", keyData);
+    DECODE_OR_DIE(key, @"key", keyData);
+
+    // decrypt message
+    int outLength1, outLength2;
+    int maxLength = encryptedSymmetric.length + EVP_MAX_BLOCK_LENGTH; // see docs for calculation
+    buf = malloc(maxLength);
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX_init(&ctx);
+    if (EVP_DecryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, key.bytes, iv.bytes) != 1) {
+        NSLog(@"Decrypt init failed");
+        return NO;
+    }
+    if (EVP_DecryptUpdate(&ctx, buf, &outLength1, encryptedSymmetric.bytes, encryptedSymmetric.length) != 1) {
+        NSLog(@"Decrypt update failed");
+        return NO;
+    }
+    if (EVP_DecryptFinal_ex(&ctx, buf + outLength1, &outLength2) != 1) {
+        NSLog(@"Decrypt final failed");
+        return NO;
+    }
+    EVP_CIPHER_CTX_cleanup(&ctx);
+    NSData *symmetric = [NSData dataWithBytes:buf length:(outLength1 + outLength2)];
+    free(buf);
+
+    // unpack
+    DECODE_OR_DIE(chunk, @"chunk", symmetric);
+    DECODE_OR_DIE(signature, @"signature", symmetric);
+
+    // verify signature
+    DECODE_OR_DIE(senderPublic, @"sender_public_key", chunk);
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(chunk.bytes, chunk.length, hash);
+    NSMutableData *mutPublicKey = [senderPublic mutableCopy];
+    bio = BIO_new_mem_buf(mutPublicKey.mutableBytes, mutPublicKey.length);
+    RSA *rsaPublicKey = PEM_read_bio_RSAPublicKey(bio, NULL, NULL, NULL);
+    if (rsaPublicKey == NULL) {
+        NSLog(@"Error extracting sender public key");
+        return NO;
+    }
+    BIO_free_all(bio);
+    if (RSA_verify(NID_sha256, hash, SHA256_DIGEST_LENGTH, signature.bytes, signature.length, rsaPublicKey) != 1) {
+        NSLog(@"Error validating signature");
+        return NO;
+    }
+    RSA_free(rsaPublicKey);
+
+    // verify recipient
+    DECODE_OR_DIE(targetPublic, @"public_key", chunk);
+    if (![targetPublic isEqualToData:keyPair.publicKey]) {
+        NSLog(@"Mismatched recipient (malicious forwarding?)");
+        return NO;
+    }
+
+    DECODE_OR_DIE(message, @"message", chunk);
+
+    if (date != nil) {
+        NSString *timestamp = [self stringForKey:@"timestamp" in:chunk];
+        NSDate *time = [self dateFromString:timestamp];
+        if (time == nil) {
+            NSLog(@"Error extracting timestamp");
+            return NO;
+        }
+        *date = time;
+    }
+    if (buffer != nil) {
+        *buffer = message;
+    }
+    if (publicKey != nil) {
+        *publicKey = senderPublic;
+    }
+
+    return YES;
 }
 
 @end

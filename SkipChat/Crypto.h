@@ -14,11 +14,11 @@
 + (KeyPair *) genKeyPair;
 
 + (NSData *) sign:(NSData *) message
-             with:(NSData *) privateKey
+             with:(KeyPair *) keyPair
     andEncryptFor:(NSData *) publicKey;
 
 + (BOOL) decrypt:(NSData *) blob
-            with:(NSData *) privateKey
+            with:(KeyPair *) keyPair
             into:(NSData **) buffer
             from:(NSData **) publicKey
               at:(NSDate **) date;
