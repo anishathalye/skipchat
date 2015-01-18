@@ -26,7 +26,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     
     // MARK: Authorization Methods
-    func getAuthorizationStatus() -> ABAuthorizationStatus {
+    class func getAuthorizationStatus() -> ABAuthorizationStatus {
         return SwiftAddressBook.authorizationStatus()
     }
     
@@ -148,7 +148,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     :returns: An Array of SwiftAddressBookPersons
     */
-    func findValueForRecord(field:String, person:SwiftAddressBookPerson) -> [MultivalueEntry<String>]? {
+    func findValueForPerson(field:String, person:SwiftAddressBookPerson) -> [MultivalueEntry<String>]? {
         return person.urls?.filter({$0.label == field})
     }
 }
