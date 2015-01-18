@@ -544,7 +544,23 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         
         if shouldSendMessage {
             if isNewMessage {
-                PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: self.toField.text.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+                var recipient : String = self.toField.text
+                var recipientPublicKey : String = "asdf" // self.peerPublicKey! TODO(change)
+                PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: recipient.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+                if let moc = self.managedObjectContext {
+                    Message.createInManagedObjectContext(moc,
+                        peer: recipient,
+                        publicKey: recipientPublicKey,
+                        text: message,
+                        outgoing: true,
+                        contactDate: NSDate()
+                    )
+                }
+                var error : NSError? = nil
+                if !self.managedObjectContext!.save(&error) {
+                    NSLog("Unresolved error \(error), \(error!.userInfo)")
+                    abort()
+                }
             } else {
                 var recipient : String = self.peer!
                 var recipientPublicKey : String = self.peerPublicKey!

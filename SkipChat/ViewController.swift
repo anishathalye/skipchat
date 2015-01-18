@@ -44,6 +44,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 //        self.networkingLayer = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
 //        self.networkingLayer?.send("asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, recipient: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
         self.networkingLayer = PtoPProtocol.sharedInstance
+        self.networkingLayer.delegate = self
         
         fetchMessages()
         
@@ -105,7 +106,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         // Create a sort descriptor object that sorts on the "title"
         // property of the Core Data object
-        let sortDescriptor = NSSortDescriptor(key: "contactDate", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "contactDate", ascending: true)
         
         // Set the list of sort descriptors in the fetch request,
         // so it includes the sort descriptor
@@ -131,7 +132,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let cell = tableView.dequeueReusableCellWithIdentifier("MessageCell") as MessageTableViewCell
         
         // Get the message for this index
-        let messageItem = (messages[contacts[indexPath.row] as String] as [Message])[0]
+        let messageItems = messages[contacts[indexPath.row] as String] as [Message]
+        let messageItem = messageItems[messageItems.count-1]
         
         // Set the title of the cell to be the title of the logItem
         cell.messagePeerLabel.text = messageItem.peer
