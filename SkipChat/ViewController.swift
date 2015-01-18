@@ -39,6 +39,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if(ContaggedManager.getAuthorizationStatus() != ABAuthorizationStatus.Authorized){
+            
+            swiftAddressBook?.requestAccessWithCompletion({ (success, error) -> Void in
+                if success {
+                    //do something with swiftAddressBook
+                } else {
+                    //no success, access denied. Optionally evaluate error
+                }
+            })
+        }
+        
         // Do any additional setup after loading the view, typically from a nib.
         self.networkingLayer = PtoPProtocol.sharedInstance
         self.networkingLayer.delegate = self
