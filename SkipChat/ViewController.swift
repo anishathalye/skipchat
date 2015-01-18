@@ -9,11 +9,13 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate {
     let IOS_BAR_HEIGHT : Float = 20.0
     let ROWS_PER_SCREEN : Float = 8.0
+    let NAV_BAR_HEIGHT : Float = 64.0
     var networkingLayer : PtoPProtocol!
     var messageTable = UITableView(frame: CGRectZero, style: .Plain)
+    var navBar : UINavigationBar = UINavigationBar(frame: CGRectZero)
     var messages : [Message]!
 
     required init(coder aDecoder: NSCoder) {
@@ -54,31 +56,54 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         fetchMessages()
         
+        
         // Store the full frame in a temporary variable
         var viewFrame = self.view.frame
         
         // Adjust it down by 20 points
-        viewFrame.origin.y += CGFloat(IOS_BAR_HEIGHT)
+        viewFrame.origin.y += CGFloat(NAV_BAR_HEIGHT)
         
         // Reduce the total height by 20 points
-        viewFrame.size.height -= CGFloat(IOS_BAR_HEIGHT)
+        viewFrame.size.height -= CGFloat(NAV_BAR_HEIGHT)
         
         // Set the logTableview's frame to equal our temporary variable with the full size of the view
         // adjusted to account for the status bar height
         self.messageTable.frame = viewFrame
+        self.messageTable.allowsSelection = false
         
         // Add the table view to this view controller's view
         self.view.addSubview(messageTable)
         
         // Here, we tell the table view that we intend to use a cell we're going to call "LogCell"
         // This will be associated with the standard UITableViewCell class for now
-        self.messageTable.registerClass(UITableViewCell.classForCoder(), forCellReuseIdentifier: "MessageCell")
+        self.messageTable.registerClass(MessageTableViewCell.classForCoder(), forCellReuseIdentifier: "MessageCell")
         
         // This tells the table view that it should get it's data from this class, ViewController
         self.messageTable.dataSource = self
         self.messageTable.delegate = self
         
-        presentItemInfo()
+        
+        navBar.frame = CGRectMake(0, 0, self.view.frame.width, CGFloat(NAV_BAR_HEIGHT))
+        navBar.layer.masksToBounds = false
+        navBar.delegate = self
+        
+        // Create a navigation item with a title
+        let navigationItem = UINavigationItem()
+        navigationItem.title = "SkipChat"
+        
+        // Create left and right button for navigation item
+        //        let leftButton = UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
+        let rightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: nil)
+        
+        // Create two buttons for the navigation item
+        //        navigationItem.leftBarButtonItem = leftButton
+        navigationItem.rightBarButtonItem = rightButton
+        
+        // Assign the navigation item to the navigation bar
+        navBar.items = [navigationItem]
+        
+        
+        self.view.addSubview(navBar)
     }
 
     override func didReceiveMemoryWarning() {
@@ -101,21 +126,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             messages = fetchResults
         }
     }
-    
-    func presentItemInfo() {
-        let fetchRequest = NSFetchRequest(entityName: "Message")
-        let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [Message]
-    }
 
     // UITableViewDataSource
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("MessageCell") as UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("MessageCell") as MessageTableViewCell
         
         // Get the LogItem for this index
         let messageItem = messages[indexPath.row]
         
         // Set the title of the cell to be the title of the logItem
-        cell.textLabel?.text = messageItem.text
+        cell.messagePeerLabel.text = messageItem.peer
+        cell.messageTextLabel.text = messageItem.text
+        
         return cell
     }
     
@@ -126,6 +148,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // UITableViewDelegate
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return CGFloat((Float(self.view.frame.size.height) - IOS_BAR_HEIGHT) / ROWS_PER_SCREEN)
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        self.navigationController?.pushViewController(ComposeViewController, animated: true)
     }
     
     // PtPProtocolDelegate

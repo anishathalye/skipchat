@@ -16,6 +16,8 @@
 		150DD6FD1A6A29DD0082F6B1 /* SkipChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD6FC1A6A29DD0082F6B1 /* SkipChatTests.swift */; };
 		150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD70C1A6AD9C80082F6B1 /* PtoPProtocol.swift */; };
 		150DD7191A6B16460082F6B1 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD7181A6B16460082F6B1 /* Message.swift */; };
+		150DD71C1A6B32920082F6B1 /* MessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */; };
+		150DD71E1A6B48F10082F6B1 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,8 @@
 		150DD70E1A6ADD1F0082F6B1 /* libcommonCrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcommonCrypto.dylib; path = usr/lib/system/libcommonCrypto.dylib; sourceTree = SDKROOT; };
 		150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SkipChat-Bridging-Header.h"; sourceTree = "<group>"; };
 		150DD7181A6B16460082F6B1 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Message.swift; path = Models/Message.swift; sourceTree = SOURCE_ROOT; };
+		150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MessageTableViewCell.swift; path = Views/MessageTableViewCell.swift; sourceTree = "<group>"; };
+		150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +71,7 @@
 		150DD6D51A6A29DD0082F6B1 = {
 			isa = PBXGroup;
 			children = (
+				150DD71A1A6B326A0082F6B1 /* Views */,
 				150DD7121A6B15DA0082F6B1 /* Models */,
 				150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */,
 				150DD70E1A6ADD1F0082F6B1 /* libcommonCrypto.dylib */,
@@ -96,6 +101,7 @@
 				150DD6EF1A6A29DD0082F6B1 /* LaunchScreen.xib */,
 				150DD6E51A6A29DD0082F6B1 /* SkipChat.xcdatamodeld */,
 				150DD6E11A6A29DD0082F6B1 /* Supporting Files */,
+				150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */,
 			);
 			path = SkipChat;
 			sourceTree = "<group>";
@@ -139,6 +145,14 @@
 				150DD7181A6B16460082F6B1 /* Message.swift */,
 			);
 			name = Models;
+			sourceTree = "<group>";
+		};
+		150DD71A1A6B326A0082F6B1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -246,6 +260,8 @@
 				150DD7191A6B16460082F6B1 /* Message.swift in Sources */,
 				150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */,
 				150DD6E41A6A29DD0082F6B1 /* AppDelegate.swift in Sources */,
+				150DD71C1A6B32920082F6B1 /* MessageTableViewCell.swift in Sources */,
+				150DD71E1A6B48F10082F6B1 /* ComposeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
