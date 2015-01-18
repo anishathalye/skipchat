@@ -80,8 +80,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
                 else {
                     println("Access to contacts denied!")
                 }
-              })
-            }
+            })
         }
     }
     
