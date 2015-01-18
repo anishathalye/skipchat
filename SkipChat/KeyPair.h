@@ -13,4 +13,6 @@
 @property (nonatomic, strong) NSData *privateKey;
 @property (nonatomic, strong) NSData *publicKey;
 
++ (KeyPair *) fromPublicKey:(NSData *) publicKey andPrivateKey:(NSData *) privateKey;
+
 @end

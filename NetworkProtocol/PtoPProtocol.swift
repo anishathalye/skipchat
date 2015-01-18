@@ -8,7 +8,6 @@
 
 import Foundation
 import MultipeerConnectivity
-//import CommonCrypto
 
 protocol PtoPProtocolDelegate {
     func receive(message : NSData, pubKey : NSData, time : NSDate)
@@ -82,6 +81,7 @@ public class BufferItem {
 
 public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
     let maxBufferLength = 20
+    let defaultTTL = 10 // hops
     let serviceType = "pf-connector"
     var advertiser : MCNearbyServiceAdvertiser!
     var session : MCSession!
@@ -89,8 +89,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     var browser : MCNearbyServiceBrowser!
     
     var buffer : [BufferItem]
-    var privateKey : NSData
-    var publicKey : NSData
+    var keyPair : KeyPair
     var delegate : PtoPProtocolDelegate?
     
     class var sharedInstance: PtoPProtocol {
@@ -99,17 +98,33 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
         }
         
         if NetworkingLayer.instance == nil {
-            NetworkingLayer.instance = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
+            let defaults = NSUserDefaults.standardUserDefaults()
+            var privateKey: NSData?
+            var publicKey: NSData?
+            privateKey = defaults.objectForKey("private_key") as? NSData
+            publicKey = defaults.objectForKey("public_key") as? NSData
+            if (privateKey == nil || publicKey == nil) {
+                NSLog("Generating keypair...")
+                let keyPair = Crypto.genKeyPair()
+                privateKey = keyPair.privateKey
+                publicKey = keyPair.publicKey
+                defaults.setObject(privateKey, forKey: "private_key")
+                defaults.setObject(publicKey, forKey: "public_key")
+                NSLog("Done generating keypair")
+            } else {
+                NSLog("Using saved keypair")
+            }
+            let stringKey = publicKey!.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.allZeros)
+            NSLog("Public key: \(stringKey)")
+            NetworkingLayer.instance = PtoPProtocol(keyPair: KeyPair.fromPublicKey(publicKey!, andPrivateKey: privateKey!))
         }
         
         return NetworkingLayer.instance!
     }
     
-    public init(prKey : NSData, pubKey : NSData) {
+    public init(keyPair: KeyPair) {
         self.buffer = []
-        self.privateKey = prKey
-        self.publicKey = pubKey
-        
+        self.keyPair = keyPair;
         self.peerID = MCPeerID(displayName: UIDevice.currentDevice().name)
         
         super.init()
@@ -129,12 +144,13 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     }
     
     // class methods
-    public func send(message: NSData, recipient: NSData){
-        println("sending new message")
-        var packet = DataPacket(blob: message, ttl: 10) // TODO encrypt
-        var item = BufferItem(packet: packet, rTime: NSDate())
-        self.buffer.append(item)
-        evict()
+    public func send(message: NSData, recipient: NSData) {
+        if let encrypted = Crypto.sign(message, with: self.keyPair, andEncryptFor: recipient) {
+            let packet = DataPacket(blob: encrypted, ttl: defaultTTL)
+            let item = BufferItem(packet: packet, rTime: NSDate())
+            self.buffer.append(item)
+            evict()
+        }
     }
     
     public func logPeers() {
@@ -148,25 +164,22 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     // MCSessionDelegate
     public func session(session: MCSession!, didReceiveData data: NSData!, fromPeer peerID: MCPeerID!) {
         // Called when a peer sends an NSData to us
-        println("did receive data")
-        
-//        // This needs to run on the main queue
-//        dispatch_async(dispatch_get_main_queue()) {
-//            
-//            var msg = NSString(data: data, encoding: NSUTF8StringEncoding)
-//            
-//            // self.updateChat(msg, fromPeer: peerID)
-//        }
+        println("Received data")
 
         var packet = DataPacket.deserialize(data)
-        // check if ours
-        var ours = false
-        
-        if ours {
-            // TODO implement
+        var from: NSData? // public key of sender
+        var time: NSDate?
+        if let decrypted = Crypto.decrypt(packet.blob, with: self.keyPair, from: &from, at: &time) {
+            println("Received message")
+            if let delegate = self.delegate? {
+                dispatch_async(dispatch_get_main_queue()) {
+                    delegate.receive(decrypted, pubKey: from!, time: time!)
+                }
+            }
         } else {
             if packet.decrementTTL() {
                 if !inBuffer(packet) {
+                    println("Propogating message by adding to our buffer")
                     buffer.append(BufferItem(packet: packet, rTime: NSDate()))
                     evict()
                 }
@@ -254,7 +267,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     }
     
     public func browser(browser: MCNearbyServiceBrowser!, foundPeer peerID: MCPeerID!, withDiscoveryInfo info: [NSObject : AnyObject]!) {
-        self.browser.invitePeer(peerID, toSession: self.session, withContext: nil, timeout: 30) // what is this constant TODO]
+        self.browser.invitePeer(peerID, toSession: self.session, withContext: nil, timeout: 0)
         println("found peer %@", peerID)
         
     }
