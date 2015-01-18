@@ -247,7 +247,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     var peerPublicKey : String? {
         didSet{
             peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!);
-            //TODO: getMessages();
             isNewMessage = false;
             setup();
         }
@@ -283,10 +282,9 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     func personSelected(person: ABRecordID!){
-        println(contaggedManager.personWithRecordId(person)?.note);
         peerPublicKey = contaggedManager.findValueForPerson(kPubKeyField, person: person)?
+        peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!);
         messages = self.rootView.getMessagesForPublicKey(peerPublicKey!)
-        peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!)
     }
     
 
