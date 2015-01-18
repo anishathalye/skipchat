@@ -3,3 +3,4 @@
 //
 
 #import "Crypto.h"
+#import "JSQMessagesViewController/JSQMessages.h"
