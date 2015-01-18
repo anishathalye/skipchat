@@ -18,6 +18,8 @@
 		150DD71C1A6B32920082F6B1 /* MessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */; };
 		155D70121A6B6AC00048F906 /* LGSimpleChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155D70101A6B6AC00048F906 /* LGSimpleChat.swift */; };
 		155D70131A6B6AC00048F906 /* License in Resources */ = {isa = PBXBuildFile; fileRef = 155D70111A6B6AC00048F906 /* License */; };
+		ACA68B871A6B8E7D0013F2F5 /* Contagged.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA68B851A6B8E7D0013F2F5 /* Contagged.swift */; };
+		ACA68B881A6B8E7D0013F2F5 /* SwiftAddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA68B861A6B8E7D0013F2F5 /* SwiftAddressBook.swift */; };
 		F86060ED1A6B24F60055EC94 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EB1A6B24F60055EC94 /* libcrypto.a */; };
 		F86060EE1A6B24F60055EC94 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EC1A6B24F60055EC94 /* libssl.a */; };
 		F8B984D91A6B5B39003AB68A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD7181A6B16460082F6B1 /* Message.swift */; };
@@ -101,6 +103,8 @@
 		150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MessageTableViewCell.swift; path = Views/MessageTableViewCell.swift; sourceTree = "<group>"; };
 		155D70101A6B6AC00048F906 /* LGSimpleChat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LGSimpleChat.swift; sourceTree = "<group>"; };
 		155D70111A6B6AC00048F906 /* License */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License; sourceTree = "<group>"; };
+		ACA68B851A6B8E7D0013F2F5 /* Contagged.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contagged.swift; sourceTree = "<group>"; };
+		ACA68B861A6B8E7D0013F2F5 /* SwiftAddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftAddressBook.swift; sourceTree = "<group>"; };
 		F86060EB1A6B24F60055EC94 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = lib/libcrypto.a; sourceTree = "<group>"; };
 		F86060EC1A6B24F60055EC94 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = lib/libssl.a; sourceTree = "<group>"; };
 		F8E91FBF1A6B35A500AACDC2 /* Crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
@@ -239,6 +243,7 @@
 		150DD6D51A6A29DD0082F6B1 = {
 			isa = PBXGroup;
 			children = (
+				ACA68B841A6B8E7D0013F2F5 /* Contagged */,
 				155D700F1A6B6AC00048F906 /* LGSimpleChat */,
 				150DD71A1A6B326A0082F6B1 /* Views */,
 				150DD7121A6B15DA0082F6B1 /* Models */,
@@ -336,6 +341,15 @@
 				155D70111A6B6AC00048F906 /* License */,
 			);
 			path = LGSimpleChat;
+			sourceTree = "<group>";
+		};
+		ACA68B841A6B8E7D0013F2F5 /* Contagged */ = {
+			isa = PBXGroup;
+			children = (
+				ACA68B851A6B8E7D0013F2F5 /* Contagged.swift */,
+				ACA68B861A6B8E7D0013F2F5 /* SwiftAddressBook.swift */,
+			);
+			path = Contagged;
 			sourceTree = "<group>";
 		};
 		F86060EF1A6B25110055EC94 /* Frameworks */ = {
@@ -676,6 +690,7 @@
 				F8E9224B1A6B58E700AACDC2 /* UIDevice+JSQMessages.m in Sources */,
 				F8E922651A6B58E700AACDC2 /* JSQMessagesCollectionViewCellOutgoing.m in Sources */,
 				F8E9226C1A6B58E700AACDC2 /* JSQMessagesMediaPlaceholderView.m in Sources */,
+				ACA68B871A6B8E7D0013F2F5 /* Contagged.swift in Sources */,
 				F8E9224E1A6B58E700AACDC2 /* JSQMessagesKeyboardController.m in Sources */,
 				F8E922541A6B58E700AACDC2 /* JSQMessagesTimestampFormatter.m in Sources */,
 				F8E9224F1A6B58E700AACDC2 /* JSQMessagesViewController.m in Sources */,
@@ -694,6 +709,7 @@
 				F8E922631A6B58E700AACDC2 /* JSQMessagesCollectionViewCellIncoming.m in Sources */,
 				F8E9224C1A6B58E700AACDC2 /* UIImage+JSQMessages.m in Sources */,
 				F8E922531A6B58E700AACDC2 /* JSQMessagesMediaViewBubbleImageMasker.m in Sources */,
+				ACA68B881A6B8E7D0013F2F5 /* SwiftAddressBook.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
