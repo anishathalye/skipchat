@@ -209,11 +209,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func receive(message : NSData, pubKey : NSData, time : NSDate) {
         println("received message on frontend")
         
-        var messageText = message.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.allZeros)
-        var messagePublicKey = message.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.allZeros)
+        var messageText = NSString(data: message, encoding: NSUTF8StringEncoding)!
+        var messagePublicKey = NSString(data: pubKey, encoding: NSUTF8StringEncoding)!
         var messagesForPubKey : [Message] = []
-        if (self.contacts.containsObject(pubKey)) {
-            messagesForPubKey = self.messages[pubKey] as [Message]
+        if (self.contacts.containsObject(messagePublicKey)) {
+            messagesForPubKey = self.messages[messagePublicKey] as [Message]
         }
         for message in messagesForPubKey {
             if message.text == messageText && message.contactDate == time {
@@ -222,7 +222,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         if let moc = self.managedObjectContext {
             Message.createInManagedObjectContext(moc,
-                peer: "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUNDZ0tDQWdFQTRjN3NDZmhUdWE0WG50enVyU044NTU2VXlEV0tRcWNzeXVwNmJEL0tNSVA3UzVxRkZJRGMKaFc5R2R3b0ZhMXZpV21qeFdyRmFMNXNRUmY2bkYvaWxWNnkwUVgwQXk3Mko3Rm81L1BtZXBFYldhTnhiK0MveAprRWVEYS9NaWwyYTVaVHJnT0RCTDhDMllDV0JoM3BUS2d0RjZvbXlCK1J2STYycU9WN1FZclp1dDl3bjhKWWovCnk4YXRvb3RYNkVpVlFwTnFNMTM5QU9waUdyZlN3RDJkMFo3a1dXTXowdVRrUDZDTFRDVENweHczS2dWcWpuWHoKemtEREltSXlQKzJnaElPWHRVOWJXT0dDTXZzUnJqUEFtYWVuNkt3UDFoL2hjS1p6VUU1QjFoeUZib0xQV0ppVAp3d0U1Wiswc2lBbllaTS9iU2RVVnJmTVlnazZPOHNHeXEyZzlJV3pzZ2FXaXYwMkpodHpiQk9zMW1iMGs5UWJtClRyS3J6cWZKN2JSTmdXNjViUzdhcWs3T1FyMmRNc29pejh3UGlVdEw0U1VTM3BhRUZ5RS9KSk0wUEFoa0V3TVUKMTI3TzNISWNjOEhaQmMxR0R0bVBHSjMxaDhURzhBV2hEaUFQT1ZUV3d3dFZSMDAzeXFpRDkva3d3VGZLeC9LTApERW1jYWVVbVVoK2Rka2pzYnZtMlBqQ24yRk5WU2NBejBYNGVyV0pQcktlczVEOFQ2NmwxZ1E3S1hMR2NBSklLCndUS0xvdWxndDV2VFhFTVpHRU1XeHI4N0gwWXk4VDRSSGxOWm9wdEx1eXpTYTc3SC9Ra25qeGNUcm1tNlB3ZXgKRlYxMDJsY1BmZ01PWmJFdUM3VkU5bEJvUm1yNmp5TVZUQkcwMnpIRGtaUHJtMm8vQzIrNHM0a0NBd0VBQVE9PQotLS0tLUVORCBSU0EgUFVCTElDIEtFWS0tLS0tCgA=", //TODO
+                peer: "Name", //TODO
                 publicKey: messagePublicKey,
                 text: messageText,
                 outgoing: false,
