@@ -122,6 +122,10 @@
     NSMutableData *mutPrivateKey = [keyPair.privateKey mutableCopy];
     bio = BIO_new_mem_buf(mutPrivateKey.mutableBytes, mutPrivateKey.length);
     RSA *rsaPrivateKey = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
+    if (rsaPrivateKey == NULL) {
+        NSLog(@"Error extracting private key");
+        return nil;
+    }
     BIO_free_all(bio);
     buf = malloc(RSA_size(rsaPrivateKey));
     unsigned int sigLength;
@@ -171,6 +175,10 @@
     NSMutableData *mutPublicKey = [publicKey mutableCopy];
     bio = BIO_new_mem_buf(mutPublicKey.mutableBytes, mutPublicKey.length);
     RSA *rsaPublicKey = PEM_read_bio_RSAPublicKey(bio, NULL, NULL, NULL);
+    if (rsaPublicKey == NULL) {
+        NSLog(@"Error extracting public key");
+        return nil;
+    }
     BIO_free_all(bio);
     buf = malloc(RSA_size(rsaPublicKey));
     int outLength;
@@ -235,6 +243,10 @@
     NSMutableData *mutPrivateKey = [keyPair.privateKey mutableCopy];
     bio = BIO_new_mem_buf(mutPrivateKey.mutableBytes, mutPrivateKey.length);
     RSA *rsaPrivateKey = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
+    if (rsaPrivateKey == NULL) {
+        NSLog(@"Error extracting private key");
+        return nil;
+    }
     BIO_free_all(bio);
     buf = malloc(RSA_size(rsaPrivateKey));
     int bufLength;
