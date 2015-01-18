@@ -10,11 +10,23 @@ import AddressBookUI
 import UIKit
 
 
+protocol ContaggedPickerDelegate {
+    func peoplePickerNavigationControllerDidCancel()
+    func personSelected(person: SwiftAddressBookPerson!)
+}
 
-class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate {
+protocol ContaggedUnknownPersonDelegate {
+    func didResolveToPerson(person: SwiftAddressBookPerson!)
+}
+
+class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, ABUnknownPersonViewControllerDelegate {
     
-    var delegate : ContaggedPickerDelegate?
+    var pickerDelegate : ContaggedPickerDelegate?
+    var unknownPersonDelegate : ContaggedUnknownPersonDelegate?
+    var viewController : UIViewController?
     
+    
+    // MARK: Authorization Methods
     func getAuthorizationStatus() -> ABAuthorizationStatus {
         return SwiftAddressBook.authorizationStatus()
     }
@@ -23,7 +35,8 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate {
         swiftAddressBook?.requestAccessWithCompletion(completion)
     }
     
-    // MARK: Contact Picker Methods
+    
+    // MARK: People Picker Methods
     func pickContact(fieldName: String) -> Void {
         let picker = ABPeoplePickerNavigationController()
         picker.peoplePickerDelegate = self
@@ -33,12 +46,12 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate {
             picker.predicateForEnablingPerson = NSPredicate(format: "ANY urls.fieldName = %@", fieldName)
         }
         
-        //presentViewController(picker, animated: true, completion: nil)
+        viewController?.presentViewController(picker, animated: true, completion: nil)
     }
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!,
         didSelectPerson person: ABRecordRef!) {
-        delegate?.personSelected(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
+        pickerDelegate?.personSelected(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
     }
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!, shouldContinueAfterSelectingPerson person: ABRecordRef!) -> Bool {
@@ -49,9 +62,35 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate {
     
     func peoplePickerNavigationControllerDidCancel(peoplePicker: ABPeoplePickerNavigationController!) {
         peoplePicker.dismissViewControllerAnimated(true, completion: nil)
-        delegate?.peoplePickerNavigationControllerDidCancel();
+        pickerDelegate?.peoplePickerNavigationControllerDidCancel();
     }
     
+    
+    
+    // MARK: Unknown Person Methods
+    func addUnknownContact(fieldName: String, value: String) -> Void {
+        let unk = ABUnknownPersonViewController()
+        unk.allowsAddingToAddressBook = true
+        unk.allowsActions = false // user can tap an email address to switch to mail, for example
+        
+        let person : SwiftAddressBookPerson = SwiftAddressBookPerson.create()
+        
+        addFieldToContact(fieldName, value: value, person: person)
+        
+        unk.displayedPerson = person
+        unk.unknownPersonViewDelegate = self
+        viewController?.showViewController(unk, sender:viewController?) // push onto navigation controller
+    }
+    
+    func unknownPersonViewController(
+        unknownCardViewController: ABUnknownPersonViewController!,
+        didResolveToPerson person: ABRecord!) {
+            unknownPersonDelegate?.didResolveToPerson(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
+    }
+    
+    
+    
+    // MARK: General access methods
     /**
     Add a field to a contact
     
@@ -61,11 +100,10 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate {
     
     :returns: A reference to a CFError object.
     */
-    func addFieldToContact(field:String, value:String, record:ABRecord) -> CFError? {
-        var person = swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(record))!
+    func addFieldToContact(field:String, value:String, person:SwiftAddressBookPerson) -> CFError? {
         let newField = MultivalueEntry<String>(value:value, label:field, id:0)
         
-        person!.urls = [newField] + (person!.urls ?? [])
+        person.urls = [newField] + (person.urls ?? [])
         
         return swiftAddressBook?.save()
     }
@@ -111,13 +149,8 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate {
     
     :returns: An Array of SwiftAddressBookPersons
     */
-    func findValueForRecord(field:String, record:ABRecord) -> [MultivalueEntry<String>]? {
-        let person = swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(record))
-        return person?.urls?.filter({$0.label == field})
+    func findValueForRecord(field:String, person:SwiftAddressBookPerson) -> [MultivalueEntry<String>]? {
+        return person.urls?.filter({$0.label == field})
     }
 }
 
-protocol ContaggedPickerDelegate  {
-    func peoplePickerNavigationControllerDidCancel()
-    func personSelected(person: SwiftAddressBookPerson!)
-}
