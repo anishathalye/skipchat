@@ -161,7 +161,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     }
 
     func getPeerName(field: String, value:String) -> String{
-        return self.findContactsByFieldValue(field, fieldValue: value)?.firstName ?? "Bob"
+        return ABRecordCopyCompositeName(findContactsByFieldValue(field, fieldValue: value)?.internalRecord).takeRetainedValue() ?? "Bob"
     }
 }
 
