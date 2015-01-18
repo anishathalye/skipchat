@@ -582,7 +582,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
             
             var recipient : String = self.peer!
             var recipientPublicKey : String = self.peerPublicKey!
-            var actualPubKey = NSData(base64EncodedString: recipientPublicKey, options: NSDataBase64DecodingOptions.allZeros)!
+            var actualPubKey = recipientPublicKey.dataUsingEncoding(NSUTF8StringEncoding)!
             PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: actualPubKey)
             
             if let moc = self.managedObjectContext {

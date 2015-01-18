@@ -127,7 +127,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [Message] {
             var allMessages = fetchResults
             for message in allMessages {
-                println(message.publicKey + " " + message.text)
                 var personMessages = NSMutableArray()
                 if (messages.objectForKey(message.publicKey) != nil) {
                     personMessages = messages.objectForKey(message.publicKey) as NSMutableArray
@@ -265,14 +264,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             abort()
         }
         self.fetchMessages()
-        println("starting")
-        println(messagePublicKey)
         var notOptionalKey : String = ""
         if (self.chatController.peerPublicKey != nil) {
             notOptionalKey = self.chatController.peerPublicKey!
         }
-        println(notOptionalKey)
-//        if notOptionalKey != "" && pubKey == notOptionalKey { //TODO(katie) shame on you
         if chatControllerSet {
             self.chatController.addNewMessage(LGChatMessage(content: messageText, sentBy: LGChatMessage.SentBy.Opponent))
         }

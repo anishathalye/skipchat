@@ -114,7 +114,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
             } else {
                 NSLog("Using saved keypair")
             }
-            let stringKey = publicKey!.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.allZeros)
+            let stringKey = NSString(data: publicKey!, encoding: NSUTF8StringEncoding)!
             NSLog("Public key: \(stringKey)")
             NetworkingLayer.instance = PtoPProtocol(keyPair: KeyPair.fromPublicKey(publicKey!, andPrivateKey: privateKey!))
         }
