@@ -84,17 +84,6 @@ class SwiftAddressBook {
         return errorIfNoSuccess { ABAddressBookRemoveRecord(self.internalAddressBook, record.internalRecord, $0) }
     }
     
-    //    //This function does not yet work
-    //    func registerExternalChangeCallback(callback: (AnyObject) -> Void) {
-    //        //call some objective C function (c function pointer does not work in swift)
-    //    }
-    //
-    //    //This function does not yet work
-    //    func unregisterExternalChangeCallback(callback: (AnyObject) -> Void) {
-    //        //call some objective C function (c function pointer does not work in swift)
-    //    }
-    
-    
     //MARK: person records
     
     var personCount : Int {
@@ -117,55 +106,9 @@ class SwiftAddressBook {
         return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeopleInSource(internalAddressBook, source.internalRecord).takeRetainedValue())
     }
     
-    func allPeopleInSourceWithSortOrdering(source : SwiftAddressBookSource, ordering : SwiftAddressBookOrdering) -> [SwiftAddressBookPerson]? {
-        return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(internalAddressBook, source.internalRecord, ordering.abPersonSortOrderingValue).takeRetainedValue())
-    }
-    
     func peopleWithName(name : String) -> [SwiftAddressBookPerson]? {
         let string : CFString = name as CFString
         return convertRecordsToPersons(ABAddressBookCopyPeopleWithName(internalAddressBook, string).takeRetainedValue())
-    }
-    
-    
-    //MARK: group records
-    
-    func groupWithRecordId(recordId : Int32) -> SwiftAddressBookGroup? {
-        return SwiftAddressBookRecord(record: ABAddressBookGetGroupWithRecordID(internalAddressBook, recordId).takeUnretainedValue()).convertToGroup()
-    }
-    
-    var groupCount : Int {
-        get {
-            return ABAddressBookGetGroupCount(internalAddressBook)
-        }
-    }
-    
-    var arrayOfAllGroups : [SwiftAddressBookGroup]? {
-        get {
-            return convertRecordsToGroups(ABAddressBookCopyArrayOfAllGroups(internalAddressBook).takeRetainedValue())
-        }
-    }
-    
-    func allGroupsInSource(source : SwiftAddressBookSource) -> [SwiftAddressBookGroup]? {
-        return convertRecordsToGroups(ABAddressBookCopyArrayOfAllGroupsInSource(internalAddressBook, source.internalRecord).takeRetainedValue())
-    }
-    
-    
-    //MARK: sources
-    
-    var defaultSource : SwiftAddressBookSource? {
-        get {
-            return SwiftAddressBookSource(record: ABAddressBookCopyDefaultSource(internalAddressBook).takeRetainedValue())
-        }
-    }
-    
-    func sourceWithRecordId(sourceId : Int32) -> SwiftAddressBookSource? {
-        return SwiftAddressBookSource(record: ABAddressBookGetSourceWithRecordID(internalAddressBook, sourceId).takeUnretainedValue())
-    }
-    
-    var allSources : [SwiftAddressBookSource]? {
-        get {
-            return convertRecordsToSources(ABAddressBookCopyArrayOfAllSources(internalAddressBook).takeRetainedValue())
-        }
     }
     
 }
@@ -217,15 +160,6 @@ class SwiftAddressBookRecord {
 
 class SwiftAddressBookSource : SwiftAddressBookRecord {
     
-    var sourceType : SwiftAddressBookSourceType {
-        get {
-            let sourceType : CFNumber = ABRecordCopyValue(internalRecord, kABSourceTypeProperty).takeRetainedValue() as CFNumber
-            var rawSourceType : Int32? = nil
-            CFNumberGetValue(sourceType, CFNumberGetType(sourceType), &rawSourceType)
-            return SwiftAddressBookSourceType(abSourceType: rawSourceType!)
-        }
-    }
-    
     var searchable : Bool {
         get {
             let sourceType : CFNumber = ABRecordCopyValue(internalRecord, kABSourceTypeProperty).takeRetainedValue() as CFNumber
@@ -265,10 +199,6 @@ class SwiftAddressBookGroup : SwiftAddressBookRecord {
         get {
             return convertRecordsToPersons(ABGroupCopyArrayOfAllMembers(internalRecord).takeRetainedValue())
         }
-    }
-    
-    func allMembersWithSortOrdering(ordering : SwiftAddressBookOrdering) -> [SwiftAddressBookPerson]? {
-        return convertRecordsToPersons(ABGroupCopyArrayOfAllMembersWithSortOrdering(internalRecord, ordering.abPersonSortOrderingValue).takeRetainedValue())
     }
     
     func addMember(person : SwiftAddressBookPerson) -> CFError? {
@@ -323,15 +253,6 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
         return NSString(data: data, encoding: NSUTF8StringEncoding)!
     }
     
-    class func ordering() -> SwiftAddressBookOrdering {
-        return SwiftAddressBookOrdering(ordering: ABPersonGetSortOrdering())
-    }
-    
-    class func comparePeopleByName(person1 : SwiftAddressBookPerson, person2 : SwiftAddressBookPerson, ordering : SwiftAddressBookOrdering) -> CFComparisonResult {
-        return ABPersonComparePeopleByName(person1, person2, ordering.abPersonSortOrderingValue)
-    }
-    
-    
     
     
     //MARK: Personal Information
@@ -378,15 +299,12 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
         }
     }
     
-    var compositeNameFormat : SwiftAddressBookCompositeNameFormat {
-        get {
-            return SwiftAddressBookCompositeNameFormat(format: ABPersonGetCompositeNameFormatForRecord(internalRecord))
-        }
-    }
     
     var firstName : String? {
         get {
-            return extractProperty(kABPersonFirstNameProperty)
+            let value: AnyObject = ABRecordCopyValue(self.internalRecord, kABPersonFirstNameProperty).takeRetainedValue() ?? ""
+            let typedval = value as? String
+            return typedval
         }
         set {
             let value: AnyObject = newValue ?? ""
@@ -396,8 +314,9 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
     
     var lastName : String? {
         get {
-            return extractProperty(kABPersonLastNameProperty)
-        }
+            let value: AnyObject = ABRecordCopyValue(self.internalRecord, kABPersonLastNameProperty).takeRetainedValue() ?? ""
+            let typedval = value as? String
+            return typedval        }
         set {
             let value: AnyObject = newValue ?? ""
             setSingleValueProperty(kABPersonLastNameProperty, value)
@@ -504,14 +423,6 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
         }
     }
     
-    var emails : Array<MultivalueEntry<String>>? {
-        get {
-            return extractMultivalueProperty(kABPersonEmailProperty)
-        }
-        set {
-            setMultivalueProperty(kABPersonEmailProperty, convertMultivalueEntries(newValue, converter: { NSString(string : $0) }))
-        }
-    }
     
     var birthday : NSDate? {
         get {
@@ -524,7 +435,9 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
     
     var note : String? {
         get {
-            return extractProperty(kABPersonNoteProperty)
+            let value: AnyObject = ABRecordCopyValue(self.internalRecord, kABPersonNoteProperty).takeRetainedValue() ?? ""
+            let typedval = value as? String
+            return typedval
         }
         set {
             let value: AnyObject = newValue ?? ""
@@ -550,78 +463,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
         }
     }
     
-    var addresses : Array<MultivalueEntry<Dictionary<SwiftAddressBookAddressProperty,AnyObject>>>? {
-        get {
-            return extractMultivalueProperty(kABPersonAddressProperty)
-        }
-        set {
-            setMultivalueDictionaryProperty(kABPersonAddressProperty, newValue, { NSString(string: $0.abAddressProperty) }, {$0} )
-        }
-    }
     
-    var dates : Array<MultivalueEntry<NSDate>>? {
-        get {
-            return extractMultivalueProperty(kABPersonDateProperty)
-        }
-        set {
-            setMultivalueProperty(kABPersonDateProperty, newValue)
-        }
-    }
-    
-    var type : SwiftAddressBookPersonType? {
-        get {
-            return SwiftAddressBookPersonType(type : extractProperty(kABPersonMiddleNameProperty))
-        }
-        set {
-            setSingleValueProperty(kABPersonMiddleNameProperty, newValue?.abPersonType)
-        }
-    }
-    
-    var phoneNumbers : Array<MultivalueEntry<String>>? {
-        get {
-            return extractMultivalueProperty(kABPersonPhoneProperty)
-        }
-        set {
-            setMultivalueProperty(kABPersonPhoneProperty, convertMultivalueEntries(newValue, converter: {NSString(string: $0)}))
-        }
-    }
-    
-    var instantMessage : Array<MultivalueEntry<Dictionary<SwiftAddressBookInstantMessagingProperty,String>>>? {
-        get {
-            return extractMultivalueProperty(kABPersonInstantMessageProperty)
-        }
-        set {
-            setMultivalueDictionaryProperty(kABPersonInstantMessageProperty, newValue, keyConverter: { NSString(string: $0.abInstantMessageProperty) }, valueConverter: { NSString(string: $0) })
-        }
-    }
-    
-    var socialProfiles : Array<MultivalueEntry<Dictionary<SwiftAddressBookSocialProfileProperty,String>>>? {
-        get {
-            return extractMultivalueProperty(kABPersonSocialProfileProperty)
-        }
-        set {
-            setMultivalueDictionaryProperty(kABPersonSocialProfileProperty, newValue, keyConverter: { NSString(string: $0.abSocialProfileProperty) }, valueConverter:  { NSString(string : $0) } )
-        }
-    }
-    
-    
-    var urls : Array<MultivalueEntry<String>>? {
-        get {
-            return extractMultivalueProperty(kABPersonURLProperty)
-        }
-        set {
-            setMultivalueProperty(kABPersonURLProperty, convertMultivalueEntries(newValue, converter: { NSString(string : $0) }))
-        }
-    }
-    
-    var relatedNames : Array<MultivalueEntry<String>>? {
-        get {
-            return extractMultivalueProperty(kABPersonRelatedNamesProperty)
-        }
-        set {
-            setMultivalueProperty(kABPersonRelatedNamesProperty, convertMultivalueEntries(newValue, converter: { NSString(string : $0) }))
-        }
-    }
     
     var alternateBirthday : Dictionary<String, AnyObject>? {
         get {
@@ -637,31 +479,16 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
     //MARK: generic methods to set and get person properties
     
     private func extractProperty<T>(propertyName : ABPropertyID) -> T? {
-        return ABRecordCopyValue(self.internalRecord, propertyName).takeRetainedValue() as? T
+        let copyval = ABRecordCopyValue(self.internalRecord, propertyName)
+        let retval = copyval.takeRetainedValue()
+        let typedval = retval as? T
+        return typedval
     }
     
     private func setSingleValueProperty<T : AnyObject>(key : ABPropertyID,_ value : T?) {
         ABRecordSetValue(self.internalRecord, key, value, nil)
     }
     
-    private func extractMultivalueProperty<T>(propertyName : ABPropertyID) -> Array<MultivalueEntry<T>>? {
-        var array = Array<MultivalueEntry<T>>()
-        let multivalue : ABMultiValue? = extractProperty(propertyName)
-        for i : Int in 0..<(ABMultiValueGetCount(multivalue)) {
-            let value : T? = ABMultiValueCopyValueAtIndex(multivalue, i).takeRetainedValue() as? T
-            if let v : T = value {
-                let id : Int = Int(ABMultiValueGetIdentifierAtIndex(multivalue, i))
-                let label : String = ABMultiValueCopyLabelAtIndex(multivalue, i).takeRetainedValue()
-                array.append(MultivalueEntry(value: v, label: label, id: id))
-            }
-        }
-        if array.count > 0 {
-            return array
-        }
-        else {
-            return nil
-        }
-    }
     
     private func convertDictionary<T,U, V : AnyObject, W : AnyObject where V : Hashable>(d : Dictionary<T,U>?, keyConverter : (T) -> V, valueConverter : (U) -> W ) -> NSDictionary? {
         if let d2 = d {
@@ -675,122 +502,15 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return nil
         }
     }
-    
-    private func convertMultivalueEntries<T,U : AnyObject>(multivalue : Array<MultivalueEntry<T>>?, converter : (T) -> U) -> Array<MultivalueEntry<U>>? {
-        return multivalue?.map { m -> MultivalueEntry<U> in
-            return MultivalueEntry(value: converter(m.value), label: m.label, id: m.id)
-        }
-    }
-    
-    private func setMultivalueProperty<T : AnyObject>(key : ABPropertyID,_ multivalue : Array<MultivalueEntry<T>>?) {
-        if(multivalue == nil) {
-            ABRecordSetValue(internalRecord, key, ABMultiValueCreateMutable(ABMultiValueGetPropertyType(extractProperty(key))).takeRetainedValue(), nil)
-        }
-        
-        let abMultivalue: ABMutableMultiValue = ABMultiValueCreateMutableCopy(extractProperty(key)).takeRetainedValue()
-        
-        var identifiers = Array<Int>()
-        
-        for i : Int in 0..<(ABMultiValueGetCount(abMultivalue)) {
-            identifiers.append(Int(ABMultiValueGetIdentifierAtIndex(abMultivalue, i)))
-        }
-        
-        for m : MultivalueEntry in multivalue! {
-            if contains(identifiers, m.id) {
-                let index = ABMultiValueGetIndexForIdentifier(abMultivalue, Int32(m.id))
-                ABMultiValueReplaceValueAtIndex(abMultivalue, m.value, index)
-                ABMultiValueReplaceLabelAtIndex(abMultivalue, m.label, index)
-                identifiers.removeAtIndex(find(identifiers,m.id)!)
-            }
-            else {
-                ABMultiValueAddValueAndLabel(abMultivalue, m.value, m.label, nil)
-            }
-        }
-        
-        for i in identifiers {
-            ABMultiValueRemoveValueAndLabelAtIndex(abMultivalue, ABMultiValueGetIndexForIdentifier(abMultivalue,Int32(i)))
-        }
-        
-        ABRecordSetValue(internalRecord, key, abMultivalue, nil)
-    }
-    
-    private func setMultivalueDictionaryProperty<T,U, V : AnyObject,W : AnyObject where V : Hashable >(key : ABPropertyID,_ multivalue : Array<MultivalueEntry<Dictionary<T,U>>>?,keyConverter : (T) -> V , valueConverter : (U)-> W) {
-        
-        let array = convertMultivalueEntries(multivalue, converter: { d -> NSDictionary in
-            return self.convertDictionary(d, keyConverter: keyConverter, valueConverter: valueConverter)!
-        })
-        
-        setMultivalueProperty(key, array)
-    }
-}
-//MARK: swift structs for convenience
-
-enum SwiftAddressBookOrdering {
-    
-    case lastName, firstName
-    
-    init(ordering : ABPersonSortOrdering) {
-        switch Int(ordering) {
-        case kABPersonSortByLastName :
-            self = .lastName
-        case kABPersonSortByFirstName :
-            self = .firstName
-        default :
-            self = .firstName
-        }
-    }
-    
-    var abPersonSortOrderingValue : UInt32 {
-        get {
-            switch self {
-            case .lastName :
-                return UInt32(kABPersonSortByLastName)
-            case .firstName :
-                return UInt32(kABPersonSortByFirstName)
-            }
-        }
-    }
 }
 
-enum SwiftAddressBookCompositeNameFormat {
-    case firstNameFirst, lastNameFirst
-    
-    init(format : ABPersonCompositeNameFormat) {
-        switch Int(format) {
-        case kABPersonCompositeNameFormatFirstNameFirst :
-            self = .firstNameFirst
-        case kABPersonCompositeNameFormatLastNameFirst :
-            self = .lastNameFirst
-        default :
-            self = .firstNameFirst
-        }
-    }
+
+//MARK: methods to convert arrays of ABRecords
+private func convertRecordsToPersons(records : [ABRecord]?) -> [SwiftAddressBookPerson]? {
+    let swiftRecords = records?.map {(record : ABRecord) -> SwiftAddressBookPerson in return SwiftAddressBookRecord(record: record).convertToPerson()!}
+    return swiftRecords
 }
 
-enum SwiftAddressBookSourceType {
-    case local, exchange, exchangeGAL, mobileMe, LDAP, cardDAV, cardDAVSearch
-    
-    init(abSourceType : ABSourceType) {
-        switch Int(abSourceType) {
-        case kABSourceTypeLocal :
-            self = .local
-        case kABSourceTypeExchange :
-            self = .exchange
-        case kABSourceTypeExchangeGAL :
-            self = .exchangeGAL
-        case kABSourceTypeMobileMe :
-            self = .mobileMe
-        case kABSourceTypeLDAP :
-            self = .LDAP
-        case kABSourceTypeCardDAV :
-            self = .cardDAV
-        case kABSourceTypeCardDAVSearch :
-            self = .cardDAVSearch
-        default :
-            self = .local
-        }
-    }
-}
 
 enum SwiftAddressBookPersonImageFormat {
     case thumbnail
@@ -805,160 +525,6 @@ enum SwiftAddressBookPersonImageFormat {
         }
     }
 }
-
-
-enum SwiftAddressBookSocialProfileProperty {
-    case url, service, username, userIdentifier
-    
-    init(property : String) {
-        switch property {
-        case kABPersonSocialProfileURLKey :
-            self = .url
-        case kABPersonSocialProfileServiceKey :
-            self = .service
-        case kABPersonSocialProfileUsernameKey :
-            self = .username
-        case kABPersonSocialProfileUserIdentifierKey :
-            self = .userIdentifier
-        default :
-            self = .url
-        }
-    }
-    
-    var abSocialProfileProperty : String {
-        switch self {
-        case .url :
-            return kABPersonSocialProfileURLKey
-        case .service :
-            return kABPersonSocialProfileServiceKey
-        case .username :
-            return kABPersonSocialProfileUsernameKey
-        case .userIdentifier :
-            return kABPersonSocialProfileUserIdentifierKey
-        }
-    }
-}
-
-enum SwiftAddressBookInstantMessagingProperty {
-    case service, username
-    
-    init(property : String) {
-        switch property {
-        case kABPersonInstantMessageServiceKey :
-            self = .service
-        case kABPersonInstantMessageUsernameKey :
-            self = .username
-        default :
-            self = .service
-        }
-    }
-    
-    var abInstantMessageProperty : String {
-        switch self {
-        case .service :
-            return kABPersonInstantMessageServiceKey
-        case .username :
-            return kABPersonInstantMessageUsernameKey
-        }
-    }
-}
-
-enum SwiftAddressBookPersonType {
-    
-    case person, organization
-    
-    init(type : CFNumber?) {
-        if CFNumberCompare(type, kABPersonKindPerson, nil) == CFComparisonResult.CompareEqualTo  {
-            self = .person
-        }
-        else if CFNumberCompare(type, kABPersonKindOrganization, nil) == CFComparisonResult.CompareEqualTo{
-            self = .organization
-        }
-        else {
-            self = .person
-        }
-    }
-    
-    var abPersonType : CFNumber {
-        get {
-            switch self {
-            case .person :
-                return kABPersonKindPerson
-            case .organization :
-                return kABPersonKindOrganization
-            }
-        }
-    }
-}
-
-enum SwiftAddressBookAddressProperty {
-    case street, city, state, zip, country, countryCode
-    
-    init(property : String) {
-        switch property {
-        case kABPersonAddressStreetKey:
-            self = .street
-        case kABPersonAddressCityKey:
-            self = .city
-        case kABPersonAddressStateKey:
-            self = .state
-        case kABPersonAddressZIPKey:
-            self = .zip
-        case kABPersonAddressCountryKey:
-            self = .country
-        case kABPersonAddressCountryCodeKey:
-            self = .countryCode
-        default:
-            self = .street
-        }
-    }
-    
-    var abAddressProperty : String {
-        get {
-            switch self {
-            case .street :
-                return kABPersonAddressStreetKey
-            case .city :
-                return kABPersonAddressCityKey
-            case .state :
-                return kABPersonAddressStateKey
-            case .zip :
-                return kABPersonAddressZIPKey
-            case .country :
-                return kABPersonAddressCountryKey
-            case .countryCode :
-                return kABPersonAddressCountryCodeKey
-            default:
-                return kABPersonAddressStreetKey
-            }
-        }
-    }
-}
-
-struct MultivalueEntry<T> {
-    var value : T
-    var label : String
-    let id : Int
-}
-
-
-//MARK: methods to convert arrays of ABRecords
-
-private func convertRecordsToSources(records : [ABRecord]?) -> [SwiftAddressBookSource]? {
-    let swiftRecords = records?.map {(record : ABRecord) -> SwiftAddressBookSource in return SwiftAddressBookRecord(record: record).convertToSource()!}
-    return swiftRecords
-}
-
-private func convertRecordsToGroups(records : [ABRecord]?) -> [SwiftAddressBookGroup]? {
-    let swiftRecords = records?.map {(record : ABRecord) -> SwiftAddressBookGroup in return SwiftAddressBookRecord(record: record).convertToGroup()!}
-    return swiftRecords
-}
-
-private func convertRecordsToPersons(records : [ABRecord]?) -> [SwiftAddressBookPerson]? {
-    let swiftRecords = records?.map {(record : ABRecord) -> SwiftAddressBookPerson in return SwiftAddressBookRecord(record: record).convertToPerson()!}
-    return swiftRecords
-}
-
 
 
 //MARK: some more handy methods

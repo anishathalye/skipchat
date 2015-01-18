@@ -10,11 +10,11 @@ import UIKit
 
 protocol ContaggedPickerDelegate {
     func peoplePickerNavigationControllerDidCancel()
-    func personSelected(person: SwiftAddressBookPerson!, fieldValue: String?)
+    func personSelected(person: ABRecordID!)
 }
 
 protocol ContaggedUnknownPersonDelegate {
-    func didResolveToPerson(person: SwiftAddressBookPerson!)
+    func didResolveToPerson(person: ABRecordID!)
 }
 
 class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, ABUnknownPersonViewControllerDelegate {
@@ -24,6 +24,10 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     var viewController : UIViewController?
     var pickerField : String?
     
+    func personWithRecordId(recordId : Int32) -> SwiftAddressBookPerson? {
+        return swiftAddressBook?.personWithRecordId(recordId)
+    }
+
     // MARK: Authorization Methods
     class func getAuthorizationStatus() -> ABAuthorizationStatus {
         return SwiftAddressBook.authorizationStatus()
@@ -40,7 +44,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
         picker.peoplePickerDelegate = self
         
         if picker.respondsToSelector(Selector("predicateForEnablingPerson")) {
-            picker.predicateForEnablingPerson = NSPredicate(format: "SUBQUERY(%K, $url, $url.label = %@).@count > 0", ABPersonUrlAddressesProperty, fieldName)
+            picker.predicateForEnablingPerson = NSPredicate(format: "%K.length>0", ABPersonNoteProperty)
         }
         
         viewController?.presentViewController(picker, animated: true, completion: nil)
@@ -48,9 +52,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!,
         didSelectPerson person: ABRecordRef!) {
-            let person = swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person))
-            let values = findValueForPerson(pickerField!, person: person!)
-            pickerDelegate?.personSelected(person, fieldValue: values?.first?.value)
+            pickerDelegate?.personSelected(ABRecordGetRecordID(person))
     }
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!, shouldContinueAfterSelectingPerson person: ABRecordRef!) -> Bool {
@@ -90,7 +92,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     func unknownPersonViewController(
         unknownCardViewController: ABUnknownPersonViewController!,
         didResolveToPerson person: ABRecord!) {
-            unknownPersonDelegate?.didResolveToPerson(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
+            unknownPersonDelegate?.didResolveToPerson(ABRecordGetRecordID(person))
     }
     
     // MARK: General access methods
@@ -104,9 +106,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     :returns: A reference to a CFError object.
     */
     func addFieldToContact(field:String, value:String, person:SwiftAddressBookPerson) -> CFError? {
-        let newField = MultivalueEntry<String>(value:value, label:field, id:0)
-        
-        person.urls = [newField] + (person.urls ?? [])
+        person.note = value
         
         return swiftAddressBook?.save()
     }
@@ -118,13 +118,15 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     :returns: An Array of SwiftAddressBookPersons
     */
-    func findContactsWithField(field:String) -> [SwiftAddressBookPerson]? {
-        // return all contacts who have at least one url with a matching label and value
-        return swiftAddressBook?.allPeople?.filter( {
-            $0.urls?.filter({
-                $0.label == field
-            }).count > 0
-        })
+//    func findContactsWithField(field:String) -> [SwiftAddressBookPerson]? {
+//        // return all contacts who have at least one url with a matching label and value
+//        return swiftAddressBook?.allPeople?.filter( {
+//            $0.note != nil
+//        })
+//    }
+
+    func noteEquals(person: SwiftAddressBookPerson?, fieldValue:String) -> Bool {
+        return person?.note? == fieldValue;
     }
     
     /**
@@ -135,25 +137,34 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     :returns: An Array of SwiftAddressBookPersons
     */
-    func findContactsByFieldValue(field:String, fieldValue:String) -> [SwiftAddressBookPerson]? {
+    func findContactsByFieldValue(field:String, fieldValue:String) -> SwiftAddressBookPerson? {
         // return all contacts who have at least one url with a matching label and value
-        return swiftAddressBook?.allPeople?.filter( {
-            $0.urls?.filter({
-                $0.label == field && $0.value == fieldValue
-            }).count > 0
-        })
+        if let people = swiftAddressBook?.allPeople {
+            for person in people {
+                if let note = person.note{
+                    if note == fieldValue{
+                        return person;
+                    }
+                }
+            }
+        }
+        return nil;
     }
     
     /**
-    Find the value of  contacts who have a given value for the desired field
+    Find the values of contacts who have a given value for the desired field
     
     :param: field The name of our custom field
     :param: record The value for our custom field
     
     :returns: An Array of SwiftAddressBookPersons
     */
-    func findValueForPerson(field:String, person:SwiftAddressBookPerson) -> [MultivalueEntry<String>]? {
-        return person.urls?.filter({$0.label == field})
+    func findValueForPerson(field:String, person:ABRecordID!) -> String? {
+        return personWithRecordId(person)?.note;
+    }
+
+    func getPeerName(field: String, value:String) -> String{
+        return ABRecordCopyCompositeName(self.findContactsByFieldValue(field, fieldValue: value)?.internalRecord).takeRetainedValue()
     }
 }
 

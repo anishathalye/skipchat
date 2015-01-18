@@ -244,13 +244,15 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     */
     var messages: [LGChatMessage] = []
     var opponentImage: UIImage?
-    var peerPublicKey : String?
-    var peer : String? {
+    var peerPublicKey : String? {
         didSet{
+            peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!);
+            //TODO: getMessages();
             isNewMessage = false;
             setup();
         }
     }
+    var peer : String?
     var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
     var rootView : ViewController!
@@ -271,8 +273,8 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
 
     // MARK: ContaggedUnknownPersonDelegate
-    func didResolveToPerson(person: SwiftAddressBookPerson!){
-        println(ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue())
+    func didResolveToPerson(person: ABRecordID!){
+        println(ABRecordCopyCompositeName(contaggedManager.personWithRecordId(person)?.internalRecord).takeRetainedValue())
     }
 
     // MARK: ContaggedPickerDelegate
@@ -280,12 +282,15 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         // do nothing?
     }
     
-    func personSelected(person: SwiftAddressBookPerson!, fieldValue : String?){
-        peerPublicKey = fieldValue
-        peer = ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue()
+    func personSelected(person: ABRecordID!){
+        println(contaggedManager.personWithRecordId(person)?.note);
+        peerPublicKey = contaggedManager.findValueForPerson(kPubKeyField, person: person)?
         messages = self.rootView.getMessagesForPublicKey(peerPublicKey!)
+        peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!)
     }
     
+
+
     // MARK: Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -364,6 +369,10 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         contaggedManager.pickContact(kPubKeyField)
     }
     
+    func addNewContact(){
+        //TODO: something
+    }
+
     private func setupToFieldView() {
         var paddingView = UILabel(frame: CGRectMake(0, 64, 40, 50)) // hacky formatting, sorry
         paddingView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.05)
