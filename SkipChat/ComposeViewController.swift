@@ -10,6 +10,6 @@ import Foundation
 import UIKit
 import CoreData
 
-class ComposeViewController {
+class ComposeViewController : UIViewController {
     
 }
