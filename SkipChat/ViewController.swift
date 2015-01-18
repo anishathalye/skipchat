@@ -111,11 +111,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [Message] {
             var allMessages = fetchResults
             for message in allMessages {
+                println(message.publicKey + " " + message.text)
                 var personMessages = NSMutableArray()
                 if (messages.objectForKey(message.publicKey) != nil) {
                     personMessages = messages.objectForKey(message.publicKey) as NSMutableArray
                 } else {
-                    self.contacts.addObject(message.publicKey)
+                    self.contacts.insertObject(message.publicKey, atIndex: 0)
                 }
                 personMessages.addObject(message)
                 messages.setObject(personMessages, forKey: message.publicKey)

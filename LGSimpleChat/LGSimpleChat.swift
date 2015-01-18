@@ -570,18 +570,19 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         }
         
         if shouldSendMessage {
-            var recipient : String = "Recipient Name"
-            var recipientPublicKey : String = "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUNDZ0tDQWdFQWwwaGE5YjJEN29QSS90b1psRHFFSGpaMVM1N3hPZHRhTTVLQUpCNHVaVWhvRmYyQyt0cncKMlJQWjAxd2M1ZmNoTDkvWnBQbTVCYUJZM3JEd0t4R0RQZU93THc3d1hKZnJ3N0dibGdMcjRuajdQdC9JTGNoTwpnWWJSOVN2MzF1cVUwa2pTM2ZrSkowU3lHZERGM1VSY2E4L1dtS01WMi9ocWl6ZDJhcnB0RldadlBxTEZodXVrCkRsT3k0VTVid2JZTUVKam9MVkduU1lWOVIwRXRxNjkzSlBTMjNKQlRHbXgzaGxKZnhVV1ByOGRwYWNFOStRazYKRU1SWUJXMFF4czZDajV6OUNZejZUS3ZySnlKQk1CU0JPb1B1dCthUmxOc0R1MzRuWWhMblNyWFNKbXlFcjVmVQpKUll1MGo1U2R5N1lRdnY2a1Z5RzM1eEVOdEhTU0UweTFGM1VNMDM5SVdscElod1ErYmc5eFl2OERtZGdqNjFxCjI1Vm1MYnBnS0pIVm9USTFxbXlDVTFpa2kwUHlKT21OWXFHbEhkbXByZmtUSGQzU2lBL0FQRW5BTFNqNDBuNFIKM1BPVGhHbkt5MndBUlROVlJLZTlVanAwdForQmNCSHU0bm5QR0RVMjdOMlNZS0c2NVN1SDRrVDJqTFZwaFc0ZgpRWnAyMndSY0lEZUJXSTlldkttaFBMYW9CNTh3a2pVK0d5ZEtVazR4VFZvY0syMUxyMUJ4bUgrTWZzMlF4U3M3CnRvTnlyY3ZZalRoOFpkNmUyZUZtTGdlT092WFhzaThqd2JxQ2xPSk8wSWNjSTFBejRjOWN1bjg1eGZEeXpBUEwKZTA4NnBFeUNwQnhzbHFTNHFhZ0RBbURmRUYvUC80MXJRZHBmQ1RXNTNETnZRbGR6ejVDZDhWc0NBd0VBQVE9PQotLS0tLUVORCBSU0EgUFVCTElDIEtFWS0tLS0tCgA="
+            var recipient : String = "Name"
+            var recipientPublicKey : String = "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUNDZ0tDQWdFQXF0OTVtTnJla29IUXhPYkpwYnZ5a29TZjJOcUpqcU9HdWNOcWtGQXNUS2NBdGpyd2FHbUEKY1k2Z2thaWRYK3I1Zk1LcVU4azRxNERCQ1Q5TVVhelFBMi82eWVxKzVyTVVKYnhLdkdXU1AwckthRno2dWVNKwpUdkZkcVF6THFmTzVEKzhBTVlrZUYzV210ZFA1dnJ5UjMyZDFUTDFYdjIxaGZxWEROVEZ2UVBJR1ErMXNyNFcvCloyL1YycFN6U053OFJKN3lYNUlxTStqWmVWTVMvL3RmanJUSkZqTmhsVi9FZXI1TnhjOHB5MEhPZllKRXFvTjAKUGZ0V3Q0TzlTSEtsZkI4UE5mSEZPYkV0Z1A0ejJ2YmhERmNwTExYeEVKeHFOWXRjaG8rSmZoaEpJeGFmUXlQeQp1NFl5WVBhdWFBM0VLRzJOS1VpNXhRaDIzamRLOGo1Z3oreVpOL05BTWpPZ1lNQ3pwSEJWaXNRTWlrQlFuSEVlCjV1bllpVHpxVUJSVnlRaUJ6YlFaMWdEdkxtZmNsOStoSElhdXlvelgzSEpNTlpYa3dlNVlzTlhhNDdrOVRwQmgKZE9PaU93MHpVdTlTZFhqWGx0dlpZSFdSUjR2SFZUbGpkZDZLWm5YZjE0NDhWeWl2MnRIMVEvRitSb2NBa0VnRgp0Z2tOc21QQ3NXSXVIU2ZvYytLOTRNYnZCR2FPbTRPUTFlM21kV09EWDdDbHpEcXZaOG5kODdielEzMnlCcUFSCi85ZHFjdGJmd2R6dnlNZUhZWHNmQUsyRGJHZjNVV1NMc0FoK0pwQ1Ird0FmcStPQWdNc2xKNWdMMUpZSUR1bCsKTXIwTWgvRkFWZVR5eG1vb29yYURHUnMxVU80V3VJdjBEcGpUdmg0aGd2aWRscVNGRTZ5clBOa0NBd0VBQVE9PQotLS0tLUVORCBSU0EgUFVCTElDIEtFWS0tLS0tCgA="
             if isNewMessage {
                 recipient = self.toField.text
                 // recipientPublicKey = "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUNDZ0tDQWdFQTRjN3NDZmhUdWE0WG50enVyU044NTU2VXlEV0tRcWNzeXVwNmJEL0tNSVA3UzVxRkZJRGMKaFc5R2R3b0ZhMXZpV21qeFdyRmFMNXNRUmY2bkYvaWxWNnkwUVgwQXk3Mko3Rm81L1BtZXBFYldhTnhiK0MveAprRWVEYS9NaWwyYTVaVHJnT0RCTDhDMllDV0JoM3BUS2d0RjZvbXlCK1J2STYycU9WN1FZclp1dDl3bjhKWWovCnk4YXRvb3RYNkVpVlFwTnFNMTM5QU9waUdyZlN3RDJkMFo3a1dXTXowdVRrUDZDTFRDVENweHczS2dWcWpuWHoKemtEREltSXlQKzJnaElPWHRVOWJXT0dDTXZzUnJqUEFtYWVuNkt3UDFoL2hjS1p6VUU1QjFoeUZib0xQV0ppVAp3d0U1Wiswc2lBbllaTS9iU2RVVnJmTVlnazZPOHNHeXEyZzlJV3pzZ2FXaXYwMkpodHpiQk9zMW1iMGs5UWJtClRyS3J6cWZKN2JSTmdXNjViUzdhcWs3T1FyMmRNc29pejh3UGlVdEw0U1VTM3BhRUZ5RS9KSk0wUEFoa0V3TVUKMTI3TzNISWNjOEhaQmMxR0R0bVBHSjMxaDhURzhBV2hEaUFQT1ZUV3d3dFZSMDAzeXFpRDkva3d3VGZLeC9LTApERW1jYWVVbVVoK2Rka2pzYnZtMlBqQ24yRk5WU2NBejBYNGVyV0pQcktlczVEOFQ2NmwxZ1E3S1hMR2NBSklLCndUS0xvdWxndDV2VFhFTVpHRU1XeHI4N0gwWXk4VDRSSGxOWm9wdEx1eXpTYTc3SC9Ra25qeGNUcm1tNlB3ZXgKRlYxMDJsY1BmZ01PWmJFdUM3VkU5bEJvUm1yNmp5TVZUQkcwMnpIRGtaUHJtMm8vQzIrNHM0a0NBd0VBQVE9PQotLS0tLUVORCBSU0EgUFVCTElDIEtFWS0tLS0tCgA=" // self.peerPublicKey! TODO(change)
             }
-            PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: NSData(base64EncodedString: recipientPublicKey, options: NSDataBase64DecodingOptions.allZeros)!)
+            var actualPubKey = NSData(base64EncodedString: recipientPublicKey, options: NSDataBase64DecodingOptions.allZeros)!
+            PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: actualPubKey)
             
             if let moc = self.managedObjectContext {
                 Message.createInManagedObjectContext(moc,
                     peer: recipient,
-                    publicKey: recipientPublicKey,
+                    publicKey: NSString(data: actualPubKey, encoding: NSUTF8StringEncoding)!,
                     text: message,
                     outgoing: true,
                     contactDate: NSDate()
