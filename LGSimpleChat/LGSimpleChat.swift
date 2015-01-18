@@ -283,6 +283,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     // MARK: Setup
     
     private func setup() {
+        self.view.backgroundColor = UIColor.whiteColor()
         self.setupTableView()
         self.setupNavView()
         if self.isNewMessage {
@@ -319,8 +320,13 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     private func setupToFieldView() {
-        toField.frame = CGRectMake(0, 64, self.view.frame.width, 50)
-        toField.backgroundColor = UIColor.whiteColor()
+        var paddingView = UILabel(frame: CGRectMake(0, 64, 40, 50)) // hacky formatting, sorry
+        paddingView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.05)
+        paddingView.text = "   To:"
+        paddingView.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)
+        self.view.addSubview(paddingView)
+        toField.frame = CGRectMake(40, 64, self.view.frame.width, 50)
+        toField.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.05)
         self.view.addSubview(toField)
     }
     

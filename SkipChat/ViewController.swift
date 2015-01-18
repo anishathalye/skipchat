@@ -172,8 +172,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     
     func getMessages() -> [LGChatMessage] {
-        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
-        return [helloWorld]
+//        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
+        return []//[helloWorld]
     }
     
     // LGChatControllerDelegate
