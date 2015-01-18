@@ -16,7 +16,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var networkingLayer : PtoPProtocol!
     var messageTable = UITableView(frame: CGRectZero, style: .Plain)
     var navBar : UINavigationBar = UINavigationBar(frame: CGRectZero)
-    var messages : [Message]!
+    var messages : NSMutableDictionary = NSMutableDictionary()
+    var contacts : NSMutableArray = NSMutableArray()
     let contaggedManager : ContaggedManager = ContaggedManager();
 
     required init(coder aDecoder: NSCoder) {
@@ -40,25 +41,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        self.networkingLayer = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
-        self.networkingLayer?.send("asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, recipient: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
-        println(managedObjectContext!)
-        
-//        self.messageTable = UITableView(frame: self.view.bounds, style: UITableViewStyle.Plain)
-//        self.messageTable.dataSource = self;
-//        self.messageTable.delegate = self;
-//        self.view.addSubview(self.messageTable)
-        
-        // dummy data
-        if let moc = self.managedObjectContext {
-            Message.createInManagedObjectContext(moc,
-                peer: "Anish",
-                text: "hello world",
-                outgoing: true)
-        }
+//        self.networkingLayer = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
+//        self.networkingLayer?.send("asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, recipient: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
+        self.networkingLayer = PtoPProtocol.sharedInstance
         
         fetchMessages()
-        
         
         // Store the full frame in a temporary variable
         var viewFrame = self.view.frame
@@ -118,14 +105,24 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         // Create a sort descriptor object that sorts on the "title"
         // property of the Core Data object
-//        let sortDescriptor = NSSortDescriptor(key: "lastDate", ascending: true) TODO
+        let sortDescriptor = NSSortDescriptor(key: "contactDate", ascending: false)
         
         // Set the list of sort descriptors in the fetch request,
         // so it includes the sort descriptor
-//        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.sortDescriptors = [sortDescriptor]
         
         if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [Message] {
-            messages = fetchResults
+            var allMessages = fetchResults
+            for message in allMessages {
+                var personMessages = NSMutableArray()
+                if (messages.objectForKey(message.peer) != nil) {
+                    personMessages = messages.objectForKey(message.peer) as NSMutableArray
+                } else {
+                    self.contacts.addObject(message.peer)
+                }
+                personMessages.addObject(message)
+                messages.setObject(personMessages, forKey: message.peer)
+            }
         }
     }
 
@@ -133,8 +130,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MessageCell") as MessageTableViewCell
         
-        // Get the LogItem for this index
-        let messageItem = messages[indexPath.row]
+        // Get the message for this index
+        let messageItem = (messages[contacts[indexPath.row] as String] as [Message])[0]
         
         // Set the title of the cell to be the title of the logItem
         cell.messagePeerLabel.text = messageItem.peer
@@ -144,21 +141,22 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count;
+        return contacts.count;
     }
     
     // UITableViewDelegate
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return CGFloat((Float(self.view.frame.size.height) - IOS_BAR_HEIGHT) / ROWS_PER_SCREEN)
+        return 80
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("pushing new controller")
-//        self.presentViewController(ComposeViewController(), animated: true, completion: nil)
         let chatController = LGChatController()
-        chatController.opponentImage = UIImage(named: "User")
-        chatController.messages = getMessages()
-        chatController.peer = self.messages[indexPath.row].peer
+//        chatController.opponentImage = UIImage(named: "User")
+        var userMessages = self.messages[contacts[indexPath.row] as String] as [Message]
+        chatController.messages = makeLGMessages(userMessages)
+        chatController.peer = userMessages[0].peer
+        chatController.peerPublicKey = userMessages[0].publicKey
         chatController.delegate = self
         self.messageTable.deselectRowAtIndexPath(indexPath, animated: true)
         self.presentViewController(chatController, animated: true, completion: nil)
@@ -166,17 +164,22 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     public func composeNewMessage() {
         let chatController = LGChatController()
-        chatController.opponentImage = UIImage(named: "User")
-        chatController.messages = getMessages()
+//        chatController.opponentImage = UIImage(named: "User")
         chatController.delegate = self
-        chatController.isNewMessage = true 
+        chatController.isNewMessage = true
         self.presentViewController(chatController, animated: true, completion: nil)
     }
 
-    
-    func getMessages() -> [LGChatMessage] {
-//        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
-        return []//[helloWorld]
+    func makeLGMessages(userMessages : [Message]) -> [LGChatMessage] {
+        var lgMessages : [LGChatMessage] = []
+        for message in userMessages {
+            var sender = LGChatMessage.SentBy.User
+            if message.outgoing == false {
+                sender = LGChatMessage.SentBy.Opponent
+            }
+            lgMessages.append(LGChatMessage(content: message.text, sentBy: sender))
+        }
+        return lgMessages
     }
     
     // LGChatControllerDelegate
