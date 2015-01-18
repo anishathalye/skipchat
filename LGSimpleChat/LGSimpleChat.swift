@@ -253,7 +253,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
-    var rootView : ViewController?
+    var rootView : ViewController!
     
     // MARK: Private Properties
     private let sizingCell = LGChatMessageCell()
@@ -283,7 +283,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     func personSelected(person: SwiftAddressBookPerson!, fieldValue : String?){
         peerPublicKey = fieldValue
         peer = ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue()
-        //TODO: get messages
+        messages = self.rootView.getMessagesForPublicKey(peerPublicKey!)
     }
     
     // MARK: Life Cycle

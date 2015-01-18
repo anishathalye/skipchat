@@ -19,6 +19,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var messages : NSMutableDictionary = NSMutableDictionary()
     var contacts : NSMutableArray = NSMutableArray()
     let contaggedManager : ContaggedManager = ContaggedManager();
+    var currentChatPubKey : String?
+    var chatController : LGChatController = LGChatController()
+    var chatControllerSet : Bool = false
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -161,24 +164,29 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("pushing new controller")
-        let chatController = LGChatController()
+        chatController = LGChatController()
 //        chatController.opponentImage = UIImage(named: "User")
         chatController.messages = getMessagesForPublicKey(contacts[indexPath.row] as String) as [LGChatMessage]
         let earliestMessage = getEarliestMessageForPublicKey(contacts[indexPath.row] as String) as Message
         chatController.peer = earliestMessage.peer
         chatController.peerPublicKey = earliestMessage.publicKey
+        currentChatPubKey = earliestMessage.publicKey
         chatController.rootView = self
         chatController.delegate = self
+        chatControllerSet = true
         self.messageTable.deselectRowAtIndexPath(indexPath, animated: true)
         self.presentViewController(chatController, animated: true, completion: nil)
     }
     
     internal func composeNewMessage() {
-        let chatController = LGChatController()
+        chatController = LGChatController()
 //        chatController.opponentImage = UIImage(named: "User")
         chatController.delegate = self
         chatController.isNewMessage = true
         chatController.rootView = self
+        chatController.peer = "Name"
+        chatControllerSet = true
+        chatController.peerPublicKey = "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUNDZ0tDQWdFQXF0OTVtTnJla29IUXhPYkpwYnZ5a29TZjJOcUpqcU9HdWNOcWtGQXNUS2NBdGpyd2FHbUEKY1k2Z2thaWRYK3I1Zk1LcVU4azRxNERCQ1Q5TVVhelFBMi82eWVxKzVyTVVKYnhLdkdXU1AwckthRno2dWVNKwpUdkZkcVF6THFmTzVEKzhBTVlrZUYzV210ZFA1dnJ5UjMyZDFUTDFYdjIxaGZxWEROVEZ2UVBJR1ErMXNyNFcvCloyL1YycFN6U053OFJKN3lYNUlxTStqWmVWTVMvL3RmanJUSkZqTmhsVi9FZXI1TnhjOHB5MEhPZllKRXFvTjAKUGZ0V3Q0TzlTSEtsZkI4UE5mSEZPYkV0Z1A0ejJ2YmhERmNwTExYeEVKeHFOWXRjaG8rSmZoaEpJeGFmUXlQeQp1NFl5WVBhdWFBM0VLRzJOS1VpNXhRaDIzamRLOGo1Z3oreVpOL05BTWpPZ1lNQ3pwSEJWaXNRTWlrQlFuSEVlCjV1bllpVHpxVUJSVnlRaUJ6YlFaMWdEdkxtZmNsOStoSElhdXlvelgzSEpNTlpYa3dlNVlzTlhhNDdrOVRwQmgKZE9PaU93MHpVdTlTZFhqWGx0dlpZSFdSUjR2SFZUbGpkZDZLWm5YZjE0NDhWeWl2MnRIMVEvRitSb2NBa0VnRgp0Z2tOc21QQ3NXSXVIU2ZvYytLOTRNYnZCR2FPbTRPUTFlM21kV09EWDdDbHpEcXZaOG5kODdielEzMnlCcUFSCi85ZHFjdGJmd2R6dnlNZUhZWHNmQUsyRGJHZjNVV1NMc0FoK0pwQ1Ird0FmcStPQWdNc2xKNWdMMUpZSUR1bCsKTXIwTWgvRkFWZVR5eG1vb29yYURHUnMxVU80V3VJdjBEcGpUdmg0aGd2aWRscVNGRTZ5clBOa0NBd0VBQVE9PQotLS0tLUVORCBSU0EgUFVCTElDIEtFWS0tLS0tCgA="
         self.presentViewController(chatController, animated: true, completion: nil)
     }
 
@@ -236,6 +244,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             abort()
         }
         self.fetchMessages()
+        println("starting")
+        println(messagePublicKey)
+        var notOptionalKey : String = ""
+        if (self.chatController.peerPublicKey != nil) {
+            notOptionalKey = self.chatController.peerPublicKey!
+        }
+        println(notOptionalKey)
+//        if notOptionalKey != "" && pubKey == notOptionalKey { //TODO(katie) shame on you
+        if chatControllerSet {
+            self.chatController.addNewMessage(LGChatMessage(content: messageText, sentBy: LGChatMessage.SentBy.Opponent))
+        }
     }
 }
 
