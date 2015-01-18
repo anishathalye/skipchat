@@ -99,7 +99,23 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
         }
         
         if NetworkingLayer.instance == nil {
-            NetworkingLayer.instance = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
+            let defaults = NSUserDefaults.standardUserDefaults()
+            var privateKey: NSData?
+            var publicKey: NSData?
+            privateKey = defaults.objectForKey("private_key") as? NSData
+            publicKey = defaults.objectForKey("public_key") as? NSData
+            if (privateKey == nil || publicKey == nil) {
+                NSLog("Generating keypair...")
+                let keyPair = Crypto.genKeyPair()
+                privateKey = keyPair.privateKey
+                publicKey = keyPair.publicKey
+                defaults.setObject(privateKey, forKey: "private_key")
+                defaults.setObject(publicKey, forKey: "public_key")
+                NSLog("Done generating keypair")
+            } else {
+                NSLog("Using saved keypair")
+            }
+            NetworkingLayer.instance = PtoPProtocol(prKey: privateKey!, pubKey: publicKey!)
         }
         
         return NetworkingLayer.instance!
