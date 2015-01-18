@@ -239,7 +239,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     
     let kPubKeyField = "pubkey"
 
-    // MARK: Public Properties
     /*!
     Use this to set the messages to be displayed
     */
@@ -278,11 +277,13 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
 
     // MARK: ContaggedPickerDelegate
     func peoplePickerNavigationControllerDidCancel(){
-
+        // do nothing?
     }
     
-    func personSelected(person: SwiftAddressBookPerson!){
-        peer = ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue();
+    func personSelected(person: SwiftAddressBookPerson!, fieldValue : String?){
+        peerPublicKey = fieldValue
+        peer = ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue()
+        //TODO: get messages
     }
     
     // MARK: Life Cycle
@@ -648,7 +649,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
 }
 
 // MARK: Chat Input
-
 protocol LGChatInputDelegate : class {
     func chatInputDidResize(chatInput: LGChatInput)
     func chatInput(chatInput: LGChatInput, didSendMessage message: String)

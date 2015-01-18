@@ -166,7 +166,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.presentViewController(chatController, animated: true, completion: nil)
     }
     
-    public func composeNewMessage() {
+    internal func composeNewMessage() {
         let chatController = LGChatController()
 //        chatController.opponentImage = UIImage(named: "User")
         chatController.delegate = self
