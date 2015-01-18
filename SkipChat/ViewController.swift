@@ -118,13 +118,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             var allMessages = fetchResults
             for message in allMessages {
                 var personMessages = NSMutableArray()
-                if (messages.objectForKey(message.peer) != nil) {
-                    personMessages = messages.objectForKey(message.peer) as NSMutableArray
+                if (messages.objectForKey(message.publicKey) != nil) {
+                    personMessages = messages.objectForKey(message.publicKey) as NSMutableArray
                 } else {
-                    self.contacts.addObject(message.peer)
+                    self.contacts.addObject(message.publicKey)
                 }
                 personMessages.addObject(message)
-                messages.setObject(personMessages, forKey: message.peer)
+                messages.setObject(personMessages, forKey: message.publicKey)
             }
         }
         
@@ -155,14 +155,23 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return 80
     }
     
+    func getMessagesForPublicKey(publicKey : String) -> [LGChatMessage] {
+        var userMessages = self.messages[publicKey] as [Message]
+        return makeLGMessages(userMessages)
+    }
+    
+    func getEarliestMessageForPublicKey(publicKey : String) -> Message {
+        return (self.messages[publicKey] as [Message])[0]
+    }
+    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("pushing new controller")
         let chatController = LGChatController()
 //        chatController.opponentImage = UIImage(named: "User")
-        var userMessages = self.messages[contacts[indexPath.row] as String] as [Message]
-        chatController.messages = makeLGMessages(userMessages)
-        chatController.peer = userMessages[0].peer
-        chatController.peerPublicKey = userMessages[0].publicKey
+        chatController.messages = getMessagesForPublicKey(contacts[indexPath.row] as String) as [LGChatMessage]
+        let earliestMessage = getEarliestMessageForPublicKey(contacts[indexPath.row] as String) as Message
+        chatController.peer = earliestMessage.peer
+        chatController.peerPublicKey = earliestMessage.publicKey
         chatController.rootView = self
         chatController.delegate = self
         self.messageTable.deselectRowAtIndexPath(indexPath, animated: true)
@@ -205,6 +214,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // PtPProtocolDelegate
     func receive(message : NSData, pubKey : NSData, time : NSDate) {
         println("received message on frontend")
+        
+        var messageText : String = NSString(data: message, encoding: NSUTF8StringEncoding) as String
+        var publicKey : String = NSString(data: pubKey, encoding: NSUTF8StringEncoding) as String
+        var messagesForPubKey = self.messages[pubKey] as [Message]
+        for message in messagesForPubKey {
+            if message.text == messageText && message.contactDate == time {
+                return
+            }
+        }
+        if let moc = self.managedObjectContext {
+            Message.createInManagedObjectContext(moc,
+                peer: "asdf", //TODO
+                publicKey: publicKey,
+                text: messageText,
+                outgoing: false,
+                contactDate: time
+            )
+        }
+        var error : NSError? = nil
+        if !self.managedObjectContext!.save(&error) {
+            NSLog("Unresolved error \(error), \(error!.userInfo)")
+            abort()
+        }
+        self.fetchMessages()
     }
     
     // ContaggedUnknownPersonDelegate

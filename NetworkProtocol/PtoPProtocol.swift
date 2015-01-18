@@ -130,6 +130,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     
     // class methods
     public func send(message: NSData, recipient: NSData){
+        println("sending new message")
         var packet = DataPacket(blob: message, ttl: 10) // TODO encrypt
         var item = BufferItem(packet: packet, rTime: NSDate())
         self.buffer.append(item)
