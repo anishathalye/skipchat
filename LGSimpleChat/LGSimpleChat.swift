@@ -13,6 +13,7 @@ https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2)
 */
 
 import UIKit
+import CoreData
 
 // MARK: Message
 
@@ -89,7 +90,7 @@ class LGChatMessageCell : UITableViewCell {
     
     struct Appearance {
         static var opponentColor = UIColor(red: 0.142954, green: 0.60323, blue: 0.862548, alpha: 0.88)
-        static var userColor = UIColor(red: 0.14726, green: 0.838161, blue: 0.533935, alpha: 1)
+        static var userColor = UIColor(red: 0.258824, green: 1, blue: 0.137255, alpha: 1) // #42ff23
         static var font: UIFont = UIFont.systemFontOfSize(17.0)
     }
     
@@ -229,6 +230,16 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         static let MessageCellIdentifier: String = "LGChatController.Constants.MessageCellIdentifier"
     }
     
+    lazy var managedObjectContext : NSManagedObjectContext? = {
+        let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+        if let managedObjectContext = appDelegate.managedObjectContext {
+            return managedObjectContext
+        }
+        else {
+            return nil
+        }
+    }()
+    
     // MARK: Public Properties
     
     /*!
@@ -237,6 +248,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     var messages: [LGChatMessage] = []
     var opponentImage: UIImage?
     var peer : String?
+    var peerPublicKey : String?
     var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
     
@@ -531,6 +543,29 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         }
         
         if shouldSendMessage {
+            if isNewMessage {
+                PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: self.toField.text.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+            } else {
+                var recipient : String = self.peer!
+                var recipientPublicKey : String = self.peerPublicKey!
+                
+                PtoPProtocol.sharedInstance.send(message.dataUsingEncoding(NSUTF8StringEncoding)!, recipient: recipient.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+                
+                if let moc = self.managedObjectContext {
+                    Message.createInManagedObjectContext(moc,
+                        peer: recipient,
+                        publicKey: recipientPublicKey,
+                        text: message,
+                        outgoing: true,
+                        contactDate: NSDate()
+                    )
+                }
+                var error : NSError? = nil
+                if !self.managedObjectContext!.save(&error) {
+                    NSLog("Unresolved error \(error), \(error!.userInfo)")
+                    abort()
+                }
+            }
             self.addNewMessage(newMessage)
         }
     }

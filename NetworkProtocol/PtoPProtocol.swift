@@ -92,7 +92,19 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     var privateKey : NSData
     var publicKey : NSData
     var delegate : PtoPProtocolDelegate?
+    
+    class var sharedInstance: PtoPProtocol {
+        struct NetworkingLayer {
+            static var instance: PtoPProtocol?
+        }
         
+        if NetworkingLayer.instance == nil {
+            NetworkingLayer.instance = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
+        }
+        
+        return NetworkingLayer.instance!
+    }
+    
     public init(prKey : NSData, pubKey : NSData) {
         self.buffer = []
         self.privateKey = prKey
