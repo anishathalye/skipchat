@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import AddressBookUI
+import AddressBook
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate, LGChatControllerDelegate {
     let IOS_BAR_HEIGHT : Float = 20.0
