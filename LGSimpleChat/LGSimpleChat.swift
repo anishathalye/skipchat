@@ -244,13 +244,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     */
     var messages: [LGChatMessage] = []
     var opponentImage: UIImage?
-    var peerPublicKey : String? {
-        didSet{
-            peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!);
-            isNewMessage = false;
-            setup();
-        }
-    }
+    var peerPublicKey : String?
     var peer : String?
     var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
@@ -272,8 +266,8 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
 
     // MARK: ContaggedUnknownPersonDelegate
-    func didResolveToPerson(person: ABRecordID!){
-        println(ABRecordCopyCompositeName(contaggedManager.personWithRecordId(person)?.internalRecord).takeRetainedValue())
+    func didResolveToPerson(person: SwiftAddressBookPerson?){
+        println(person?.firstName)
     }
 
     // MARK: ContaggedPickerDelegate
@@ -281,10 +275,18 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         // do nothing?
     }
     
-    func personSelected(person: ABRecordID!){
+    func personSelected(person: SwiftAddressBookPerson?){
         peerPublicKey = contaggedManager.findValueForPerson(kPubKeyField, person: person)?
         peer = contaggedManager.getPeerName(kPubKeyField, value: peerPublicKey!);
         messages = self.rootView.getMessagesForPublicKey(peerPublicKey!)
+
+        if let ppk = peerPublicKey{
+            isNewMessage = false;
+        } else {
+            isNewMessage = true;
+        }
+
+        setup();
     }
     
 

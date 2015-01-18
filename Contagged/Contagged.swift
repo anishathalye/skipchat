@@ -10,11 +10,11 @@ import UIKit
 
 protocol ContaggedPickerDelegate {
     func peoplePickerNavigationControllerDidCancel()
-    func personSelected(person: ABRecordID!)
+    func personSelected(person: SwiftAddressBookPerson?)
 }
 
 protocol ContaggedUnknownPersonDelegate {
-    func didResolveToPerson(person: ABRecordID!)
+    func didResolveToPerson(person: SwiftAddressBookPerson?)
 }
 
 class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, ABUnknownPersonViewControllerDelegate {
@@ -24,9 +24,6 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     var viewController : UIViewController?
     var pickerField : String?
     
-    func personWithRecordId(recordId : Int32) -> SwiftAddressBookPerson? {
-        return swiftAddressBook?.personWithRecordId(recordId)
-    }
 
     // MARK: Authorization Methods
     class func getAuthorizationStatus() -> ABAuthorizationStatus {
@@ -52,7 +49,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!,
         didSelectPerson person: ABRecordRef!) {
-            pickerDelegate?.personSelected(ABRecordGetRecordID(person))
+            pickerDelegate?.personSelected(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
     }
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!, shouldContinueAfterSelectingPerson person: ABRecordRef!) -> Bool {
@@ -92,7 +89,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     func unknownPersonViewController(
         unknownCardViewController: ABUnknownPersonViewController!,
         didResolveToPerson person: ABRecord!) {
-            unknownPersonDelegate?.didResolveToPerson(ABRecordGetRecordID(person))
+            unknownPersonDelegate?.didResolveToPerson(swiftAddressBook?.personWithRecordId( ABRecordGetRecordID(person)))
     }
     
     // MARK: General access methods
@@ -159,12 +156,12 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     :returns: An Array of SwiftAddressBookPersons
     */
-    func findValueForPerson(field:String, person:ABRecordID!) -> String? {
-        return personWithRecordId(person)?.note;
+    func findValueForPerson(field:String, person:SwiftAddressBookPerson?) -> String? {
+        return person?.note;
     }
 
     func getPeerName(field: String, value:String) -> String{
-        return ABRecordCopyCompositeName(self.findContactsByFieldValue(field, fieldValue: value)?.internalRecord).takeRetainedValue()
+        return self.findContactsByFieldValue(field, fieldValue: value)?.firstName ?? "Bob"
     }
 }
 
