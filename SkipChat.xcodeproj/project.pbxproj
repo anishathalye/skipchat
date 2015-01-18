@@ -16,7 +16,8 @@
 		150DD6FD1A6A29DD0082F6B1 /* SkipChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD6FC1A6A29DD0082F6B1 /* SkipChatTests.swift */; };
 		150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD70C1A6AD9C80082F6B1 /* PtoPProtocol.swift */; };
 		150DD71C1A6B32920082F6B1 /* MessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */; };
-		150DD71E1A6B48F10082F6B1 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */; };
+		155D70121A6B6AC00048F906 /* LGSimpleChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155D70101A6B6AC00048F906 /* LGSimpleChat.swift */; };
+		155D70131A6B6AC00048F906 /* License in Resources */ = {isa = PBXBuildFile; fileRef = 155D70111A6B6AC00048F906 /* License */; };
 		F86060ED1A6B24F60055EC94 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EB1A6B24F60055EC94 /* libcrypto.a */; };
 		F86060EE1A6B24F60055EC94 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EC1A6B24F60055EC94 /* libssl.a */; };
 		F8B984D91A6B5B39003AB68A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD7181A6B16460082F6B1 /* Message.swift */; };
@@ -98,7 +99,8 @@
 		150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SkipChat-Bridging-Header.h"; sourceTree = "<group>"; };
 		150DD7181A6B16460082F6B1 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Message.swift; path = Models/Message.swift; sourceTree = SOURCE_ROOT; };
 		150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MessageTableViewCell.swift; path = Views/MessageTableViewCell.swift; sourceTree = "<group>"; };
-		150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
+		155D70101A6B6AC00048F906 /* LGSimpleChat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LGSimpleChat.swift; sourceTree = "<group>"; };
+		155D70111A6B6AC00048F906 /* License */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License; sourceTree = "<group>"; };
 		F86060EB1A6B24F60055EC94 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = lib/libcrypto.a; sourceTree = "<group>"; };
 		F86060EC1A6B24F60055EC94 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = lib/libssl.a; sourceTree = "<group>"; };
 		F8E91FBF1A6B35A500AACDC2 /* Crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 		150DD6D51A6A29DD0082F6B1 = {
 			isa = PBXGroup;
 			children = (
+				155D700F1A6B6AC00048F906 /* LGSimpleChat */,
 				150DD71A1A6B326A0082F6B1 /* Views */,
 				150DD7121A6B15DA0082F6B1 /* Models */,
 				F8E922711A6B594300AACDC2 /* JSQSystemSoundPlayer */,
@@ -273,7 +276,6 @@
 				F8E91FC61A6B3D9800AACDC2 /* JsonOps.h */,
 				F8E91FC71A6B3D9800AACDC2 /* JsonOps.m */,
 				150DD6E11A6A29DD0082F6B1 /* Supporting Files */,
-				150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */,
 			);
 			path = SkipChat;
 			sourceTree = "<group>";
@@ -325,6 +327,15 @@
 				150DD71B1A6B32920082F6B1 /* MessageTableViewCell.swift */,
 			);
 			name = Views;
+			sourceTree = "<group>";
+		};
+		155D700F1A6B6AC00048F906 /* LGSimpleChat */ = {
+			isa = PBXGroup;
+			children = (
+				155D70101A6B6AC00048F906 /* LGSimpleChat.swift */,
+				155D70111A6B6AC00048F906 /* License */,
+			);
+			path = LGSimpleChat;
 			sourceTree = "<group>";
 		};
 		F86060EF1A6B25110055EC94 /* Frameworks */ = {
@@ -614,6 +625,7 @@
 				F8E922661A6B58E700AACDC2 /* JSQMessagesCollectionViewCellOutgoing.xib in Resources */,
 				150DD6F11A6A29DD0082F6B1 /* LaunchScreen.xib in Resources */,
 				150DD6EE1A6A29DD0082F6B1 /* Images.xcassets in Resources */,
+				155D70131A6B6AC00048F906 /* License in Resources */,
 				F8E922701A6B58E700AACDC2 /* JSQMessagesTypingIndicatorFooterView.xib in Resources */,
 				F8E922471A6B58E700AACDC2 /* JSQMessages.strings in Resources */,
 				F8E9226E1A6B58E700AACDC2 /* JSQMessagesToolbarContentView.xib in Resources */,
@@ -657,7 +669,6 @@
 				F8E922741A6B594300AACDC2 /* JSQSystemSoundPlayer.m in Sources */,
 				150DD6E71A6A29DD0082F6B1 /* SkipChat.xcdatamodeld in Sources */,
 				150DD71C1A6B32920082F6B1 /* MessageTableViewCell.swift in Sources */,
-				150DD71E1A6B48F10082F6B1 /* ComposeViewController.swift in Sources */,
 				F8E9225B1A6B58E700AACDC2 /* JSQMessage.m in Sources */,
 				150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */,
 				150DD6E41A6A29DD0082F6B1 /* AppDelegate.swift in Sources */,
@@ -669,6 +680,7 @@
 				F8E922541A6B58E700AACDC2 /* JSQMessagesTimestampFormatter.m in Sources */,
 				F8E9224F1A6B58E700AACDC2 /* JSQMessagesViewController.m in Sources */,
 				F8E922521A6B58E700AACDC2 /* JSQMessagesBubbleImageFactory.m in Sources */,
+				155D70121A6B6AC00048F906 /* LGSimpleChat.swift in Sources */,
 				F8E922491A6B58E700AACDC2 /* NSString+JSQMessages.m in Sources */,
 				F8E91FC51A6B360A00AACDC2 /* KeyPair.m in Sources */,
 				F8E9224A1A6B58E700AACDC2 /* UIColor+JSQMessages.m in Sources */,

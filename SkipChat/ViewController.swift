@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate, LGChatControllerDelegate {
     let IOS_BAR_HEIGHT : Float = 20.0
     let ROWS_PER_SCREEN : Float = 8.0
     let NAV_BAR_HEIGHT : Float = 64.0
@@ -69,7 +69,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // Set the logTableview's frame to equal our temporary variable with the full size of the view
         // adjusted to account for the status bar height
         self.messageTable.frame = viewFrame
-        self.messageTable.allowsSelection = false
         
         // Add the table view to this view controller's view
         self.view.addSubview(messageTable)
@@ -151,7 +150,27 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-//        self.navigationController?.pushViewController(ComposeViewController, animated: true)
+        println("pushing new controller")
+//        self.presentViewController(ComposeViewController(), animated: true, completion: nil)
+        let chatController = LGChatController()
+        chatController.opponentImage = UIImage(named: "User")
+        chatController.title = "Simple Chat"
+        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
+        chatController.messages = [helloWorld]
+        chatController.delegate = self
+        self.presentViewController(chatController, animated: true, completion: nil)
+    }
+    
+    // LGChatControllerDelegate
+    func chatController(chatController: LGChatController, didAddNewMessage message: LGChatMessage) {
+        println("Did Add Message: \(message.content)")
+    }
+    
+    func shouldChatController(chatController: LGChatController, addMessage message: LGChatMessage) -> Bool {
+        /*
+        Use this space to prevent sending a message, or to alter a message.  For example, you might want to hold a message until its successfully uploaded to a server.
+        */
+        return true
     }
     
     // PtPProtocolDelegate
