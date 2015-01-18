@@ -248,7 +248,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         if let moc = self.managedObjectContext {
             Message.createInManagedObjectContext(moc,
-                peer: "Name", //TODO
+                peer: contaggedManager.getPeerName("pubkey", value: messagePublicKey), //TODO
                 publicKey: messagePublicKey,
                 text: messageText,
                 outgoing: false,
