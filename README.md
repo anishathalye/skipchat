@@ -1,6 +1,6 @@
 # SkipChat
 
-## SkipChat is a secure, distributed peer-to-peer messaging service
+**SkipChat is a secure, distributed peer-to-peer messaging service**
 
 SkipChat is a secure, distributed peer-to-peer messaging service that works
 offline. It works by having a community of users transmit messages, hop to hop,
