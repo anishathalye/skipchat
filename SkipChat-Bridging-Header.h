@@ -4,3 +4,4 @@
 
 #import "Crypto.h"
 #import "JsonOps.h"
+#import "JSQMessagesViewController/JSQMessages.h"
