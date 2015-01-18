@@ -221,10 +221,9 @@ class LGChatMessageCell : UITableViewCell {
     optional func chatController(chatController: LGChatController, didAddNewMessage message: LGChatMessage)
 }
 
-class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataSource, LGChatInputDelegate, UINavigationBarDelegate {
+class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataSource, LGChatInputDelegate, UINavigationBarDelegate, ContaggedUnknownPersonDelegate, ContaggedPickerDelegate{
     
     // MARK: Constants
-    
     private struct Constants {
         static let MessagesSection: Int = 0;
         static let MessageCellIdentifier: String = "LGChatController.Constants.MessageCellIdentifier"
@@ -240,8 +239,9 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         }
     }()
     
+    let kPubKeyField = "pubkey"
+
     // MARK: Public Properties
-    
     /*!
     Use this to set the messages to be displayed
     */
@@ -254,20 +254,35 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     var rootView : ViewController?
     
     // MARK: Private Properties
-    
     private let sizingCell = LGChatMessageCell()
     private let tableView: UITableView = UITableView()
     private let navBar: UINavigationBar = UINavigationBar()
     private let toField: UITextField = UITextField()
     private let chatInput = LGChatInput()
     private var bottomChatInputConstraint: NSLayoutConstraint!
+    private let contaggedManager: ContaggedManager = ContaggedManager();
+
+    // MARK: ContaggedUnknownPersonDelegate
+    func didResolveToPerson(person: SwiftAddressBookPerson!){
+        println(person.firstName)
+    }
+
+    // MARK: ContaggedPickerDelegate
+    func peoplePickerNavigationControllerDidCancel(){
+
+    }
     
+    func personSelected(person: SwiftAddressBookPerson!){
+        println(person.firstName)
+    }
     
     // MARK: Life Cycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setup()
+        contaggedManager.pickerDelegate = self
+        contaggedManager.unknownPersonDelegate = self
+        contaggedManager.viewController = self
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -323,7 +338,10 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         let leftButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action:"dismissSelf")
         
         // Create two buttons for the navigation item
-        navigationItem.rightBarButtonItem = rightButton
+        if (isNewMessage) {
+            navigationItem.rightBarButtonItem = rightButton
+        }
+
         navigationItem.leftBarButtonItem = leftButton
         
         // Assign the navigation item to the navigation bar
@@ -333,7 +351,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     public func getContact() {
-        // TODO(ankush)
+        contaggedManager.pickContact(kPubKeyField)
     }
     
     private func setupToFieldView() {
