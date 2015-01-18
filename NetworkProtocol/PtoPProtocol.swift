@@ -149,6 +149,7 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
             let packet = DataPacket(blob: encrypted, ttl: defaultTTL)
             let item = BufferItem(packet: packet, rTime: NSDate())
             self.buffer.append(item)
+            self.session.sendData(item.packetItem.serialize(), toPeers: self.session.connectedPeers, withMode: MCSessionSendDataMode.Reliable, error: nil)
             evict()
         }
     }
