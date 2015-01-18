@@ -151,7 +151,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        self.navigationController?.pushViewController(ComposeViewController, animated: true)
+//        self.navigationController?.pushViewController(ComposeViewController, animated: true)
     }
     
     // PtPProtocolDelegate
