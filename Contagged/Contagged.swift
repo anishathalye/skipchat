@@ -63,16 +63,25 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     // MARK: Unknown Person Methods
     func addUnknownContact(fieldName: String, value: String) -> Void {
-        let unknownPersonViewController = ABUnknownPersonViewController()
-        unknownPersonViewController.unknownPersonViewDelegate = self
-        unknownPersonViewController.allowsAddingToAddressBook = true
-        unknownPersonViewController.allowsActions = false // user can tap an email address to switch to mail, for example
-        
-        let person : SwiftAddressBookPerson = SwiftAddressBookPerson.create()
-        addFieldToContact(fieldName, value: value, person: person)
-        unknownPersonViewController.displayedPerson = person
-        
-        viewController?.showViewController(unknownPersonViewController, sender:viewController?) // push onto navigation controller
+        if(ContaggedManager.getAuthorizationStatus() == ABAuthorizationStatus.NotDetermined){
+            swiftAddressBook?.requestAccessWithCompletion({ (success, error) -> Void in
+                if success {
+                    let unknownPersonViewController = ABUnknownPersonViewController()
+                    unknownPersonViewController.unknownPersonViewDelegate = self
+                    unknownPersonViewController.allowsAddingToAddressBook = true
+                    unknownPersonViewController.allowsActions = false // user can tap an email address to switch to mail, for example
+                    
+                    let person : SwiftAddressBookPerson = SwiftAddressBookPerson.create()
+                    self.addFieldToContact(fieldName, value: value, person: person)
+                    unknownPersonViewController.displayedPerson = person
+                    
+                    self.viewController!.showViewController(unknownPersonViewController, sender:self.viewController!) // push onto navigation controller
+                }
+                else {
+                    println("Access to contacts denied!")
+                }
+            })
+        }
     }
     
     func unknownPersonViewController(
