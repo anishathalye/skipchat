@@ -15,6 +15,8 @@
 		150DD6F11A6A29DD0082F6B1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 150DD6EF1A6A29DD0082F6B1 /* LaunchScreen.xib */; };
 		150DD6FD1A6A29DD0082F6B1 /* SkipChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD6FC1A6A29DD0082F6B1 /* SkipChatTests.swift */; };
 		150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD70C1A6AD9C80082F6B1 /* PtoPProtocol.swift */; };
+		AC2C505C1A6B4BC0009D5E7C /* Contagged.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2C505A1A6B4BBF009D5E7C /* Contagged.swift */; };
+		AC2C505D1A6B4BC0009D5E7C /* SwiftAddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2C505B1A6B4BBF009D5E7C /* SwiftAddressBook.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +44,8 @@
 		150DD70C1A6AD9C80082F6B1 /* PtoPProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PtoPProtocol.swift; path = NetworkProtocol/PtoPProtocol.swift; sourceTree = "<group>"; };
 		150DD70E1A6ADD1F0082F6B1 /* libcommonCrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcommonCrypto.dylib; path = usr/lib/system/libcommonCrypto.dylib; sourceTree = SDKROOT; };
 		150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SkipChat-Bridging-Header.h"; sourceTree = "<group>"; };
+		AC2C505A1A6B4BBF009D5E7C /* Contagged.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contagged.swift; sourceTree = "<group>"; };
+		AC2C505B1A6B4BBF009D5E7C /* SwiftAddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftAddressBook.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +69,7 @@
 		150DD6D51A6A29DD0082F6B1 = {
 			isa = PBXGroup;
 			children = (
+				AC2C50591A6B4BBF009D5E7C /* Contagged */,
 				150DD7111A6B0BA50082F6B1 /* Frontend */,
 				150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */,
 				150DD70E1A6ADD1F0082F6B1 /* libcommonCrypto.dylib */,
@@ -136,6 +141,15 @@
 			children = (
 			);
 			name = Frontend;
+			sourceTree = "<group>";
+		};
+		AC2C50591A6B4BBF009D5E7C /* Contagged */ = {
+			isa = PBXGroup;
+			children = (
+				AC2C505A1A6B4BBF009D5E7C /* Contagged.swift */,
+				AC2C505B1A6B4BBF009D5E7C /* SwiftAddressBook.swift */,
+			);
+			path = Contagged;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,6 +256,8 @@
 				150DD6E71A6A29DD0082F6B1 /* SkipChat.xcdatamodeld in Sources */,
 				150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */,
 				150DD6E41A6A29DD0082F6B1 /* AppDelegate.swift in Sources */,
+				AC2C505C1A6B4BC0009D5E7C /* Contagged.swift in Sources */,
+				AC2C505D1A6B4BC0009D5E7C /* SwiftAddressBook.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
