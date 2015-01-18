@@ -17,6 +17,9 @@
 		150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD70C1A6AD9C80082F6B1 /* PtoPProtocol.swift */; };
 		F86060ED1A6B24F60055EC94 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EB1A6B24F60055EC94 /* libcrypto.a */; };
 		F86060EE1A6B24F60055EC94 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EC1A6B24F60055EC94 /* libssl.a */; };
+		F8E91FC11A6B35A500AACDC2 /* Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = F8E91FC01A6B35A500AACDC2 /* Crypto.m */; };
+		F8E91FC51A6B360A00AACDC2 /* KeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = F8E91FC41A6B360A00AACDC2 /* KeyPair.m */; };
+		F8E91FC81A6B3D9800AACDC2 /* JsonOps.m in Sources */ = {isa = PBXBuildFile; fileRef = F8E91FC71A6B3D9800AACDC2 /* JsonOps.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +49,12 @@
 		150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SkipChat-Bridging-Header.h"; sourceTree = "<group>"; };
 		F86060EB1A6B24F60055EC94 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = lib/libcrypto.a; sourceTree = "<group>"; };
 		F86060EC1A6B24F60055EC94 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = lib/libssl.a; sourceTree = "<group>"; };
+		F8E91FBF1A6B35A500AACDC2 /* Crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
+		F8E91FC01A6B35A500AACDC2 /* Crypto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Crypto.m; sourceTree = "<group>"; };
+		F8E91FC31A6B360A00AACDC2 /* KeyPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyPair.h; sourceTree = "<group>"; };
+		F8E91FC41A6B360A00AACDC2 /* KeyPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyPair.m; sourceTree = "<group>"; };
+		F8E91FC61A6B3D9800AACDC2 /* JsonOps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JsonOps.h; sourceTree = "<group>"; };
+		F8E91FC71A6B3D9800AACDC2 /* JsonOps.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JsonOps.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +85,7 @@
 				150DD7101A6AECA80082F6B1 /* SkipChat-Bridging-Header.h */,
 				150DD70E1A6ADD1F0082F6B1 /* libcommonCrypto.dylib */,
 				150DD7061A6AD4BB0082F6B1 /* NetworkLayer */,
+				F8E91FC21A6B35F600AACDC2 /* Crypto */,
 				150DD6E01A6A29DD0082F6B1 /* SkipChat */,
 				150DD6F91A6A29DD0082F6B1 /* SkipChatTests */,
 				150DD6DF1A6A29DD0082F6B1 /* Products */,
@@ -100,6 +110,8 @@
 				150DD6ED1A6A29DD0082F6B1 /* Images.xcassets */,
 				150DD6EF1A6A29DD0082F6B1 /* LaunchScreen.xib */,
 				150DD6E51A6A29DD0082F6B1 /* SkipChat.xcdatamodeld */,
+				F8E91FC61A6B3D9800AACDC2 /* JsonOps.h */,
+				F8E91FC71A6B3D9800AACDC2 /* JsonOps.m */,
 				150DD6E11A6A29DD0082F6B1 /* Supporting Files */,
 			);
 			path = SkipChat;
@@ -152,6 +164,18 @@
 				F86060EC1A6B24F60055EC94 /* libssl.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F8E91FC21A6B35F600AACDC2 /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				F8E91FBF1A6B35A500AACDC2 /* Crypto.h */,
+				F8E91FC01A6B35A500AACDC2 /* Crypto.m */,
+				F8E91FC31A6B360A00AACDC2 /* KeyPair.h */,
+				F8E91FC41A6B360A00AACDC2 /* KeyPair.m */,
+			);
+			name = Crypto;
+			path = SkipChat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -254,10 +278,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8E91FC11A6B35A500AACDC2 /* Crypto.m in Sources */,
 				150DD6E91A6A29DD0082F6B1 /* ViewController.swift in Sources */,
+				F8E91FC81A6B3D9800AACDC2 /* JsonOps.m in Sources */,
 				150DD6E71A6A29DD0082F6B1 /* SkipChat.xcdatamodeld in Sources */,
 				150DD70D1A6AD9C80082F6B1 /* PtoPProtocol.swift in Sources */,
 				150DD6E41A6A29DD0082F6B1 /* AppDelegate.swift in Sources */,
+				F8E91FC51A6B360A00AACDC2 /* KeyPair.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
