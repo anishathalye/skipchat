@@ -7,6 +7,7 @@
 //
 
 #import "Crypto.h"
+#import "JsonOps.h"
 #import <openssl/rand.h>
 #import <openssl/evp.h>
 #import <openssl/bio.h>

@@ -17,6 +17,12 @@ class ViewController: UIViewController {
         
         self.networkingLayer = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
         self.networkingLayer?.send("asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, recipient: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
+        Crypto.genKeyPair()
+        let testdata = "hi".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
+        let dict = ["symmKey": ["test": testdata]]
+        let data = JsonOps.dataFromJson(dict)
+        let str = NSString(data: data, encoding: NSUTF8StringEncoding)!
+        println("data: \(str)")
     }
 
     override func didReceiveMemoryWarning() {
