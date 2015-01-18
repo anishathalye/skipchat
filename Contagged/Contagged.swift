@@ -72,10 +72,10 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
                     unknownPersonViewController.allowsActions = false // user can tap an email address to switch to mail, for example
                     
                     let person : SwiftAddressBookPerson = SwiftAddressBookPerson.create()
-                    addFieldToContact(fieldName, value: value, person: person)
+                    self.addFieldToContact(fieldName, value: value, person: person)
                     unknownPersonViewController.displayedPerson = person
                     
-                    viewController?.showViewController(unknownPersonViewController, sender:viewController?) // push onto navigation controller
+                    self.viewController!.showViewController(unknownPersonViewController, sender:self.viewController!) // push onto navigation controller
                 }
                 else {
                     println("Access to contacts denied!")
