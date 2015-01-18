@@ -16,7 +16,7 @@
 #import <openssl/pem.h>
 
 #define RNG_SEED_BYTES (20)
-#define RSA_BITS (4096)
+#define RSA_BITS (2048)
 #define RSA_EXPONENT (65537) // see docs for recommendations, or http://en.wikipedia.org/wiki/Coppersmith%27s_Attack
 
 @interface Crypto ()
