@@ -12,7 +12,14 @@
 @interface Crypto : NSObject
 
 + (KeyPair *) genKeyPair;
-+ (NSData *) sign:(NSData *) message with:(NSData *) privateKey andEncryptFor:(NSData *) publicKey;
-+ (BOOL) decrypt:(NSData *) blob with:(NSData *)privateKey into:(NSData **) buffer from:(NSData **) publicKey;
 
++ (NSData *) sign:(NSData *) message
+             with:(NSData *) privateKey
+    andEncryptFor:(NSData *) publicKey;
+
++ (BOOL) decrypt:(NSData *) blob
+            with:(NSData *) privateKey
+            into:(NSData **) buffer
+            from:(NSData **) publicKey
+              at:(NSDate **) date;
 @end
