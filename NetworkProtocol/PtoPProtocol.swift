@@ -163,14 +163,6 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
     public func session(session: MCSession!, didReceiveData data: NSData!, fromPeer peerID: MCPeerID!) {
         // Called when a peer sends an NSData to us
         println("Received data")
-        
-//        // This needs to run on the main queue
-//        dispatch_async(dispatch_get_main_queue()) {
-//            
-//            var msg = NSString(data: data, encoding: NSUTF8StringEncoding)
-//            
-//            // self.updateChat(msg, fromPeer: peerID)
-//        }
 
         var packet = DataPacket.deserialize(data)
         var from: NSData? // public key of sender
