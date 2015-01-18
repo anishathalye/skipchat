@@ -389,7 +389,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonFirstNameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonFirstNameProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonFirstNameProperty, value)
         }
     }
     
@@ -398,7 +399,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonLastNameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonLastNameProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonLastNameProperty, value)
         }
     }
     
@@ -407,7 +409,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonMiddleNameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonMiddleNameProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonMiddleNameProperty, value)
         }
     }
     
@@ -416,7 +419,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonPrefixProperty)
         }
         set {
-            setSingleValueProperty(kABPersonPrefixProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonPrefixProperty, value)
         }
     }
     
@@ -425,7 +429,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonSuffixProperty)
         }
         set {
-            setSingleValueProperty(kABPersonSuffixProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonSuffixProperty, value)
         }
     }
     
@@ -434,7 +439,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonNicknameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonNicknameProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonNicknameProperty, value)
         }
     }
     
@@ -443,7 +449,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonFirstNamePhoneticProperty)
         }
         set {
-            setSingleValueProperty(kABPersonFirstNamePhoneticProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonFirstNamePhoneticProperty, value)
         }
     }
     
@@ -452,7 +459,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonLastNamePhoneticProperty)
         }
         set {
-            setSingleValueProperty(kABPersonLastNamePhoneticProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonLastNamePhoneticProperty, value)
         }
     }
     
@@ -461,7 +469,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonMiddleNamePhoneticProperty)
         }
         set {
-            setSingleValueProperty(kABPersonMiddleNamePhoneticProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonMiddleNamePhoneticProperty, value)
         }
     }
     
@@ -470,7 +479,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonOrganizationProperty)
         }
         set {
-            setSingleValueProperty(kABPersonOrganizationProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonOrganizationProperty, value)
         }
     }
     
@@ -479,7 +489,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonJobTitleProperty)
         }
         set {
-            setSingleValueProperty(kABPersonJobTitleProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonJobTitleProperty, value)
         }
     }
     
@@ -488,7 +499,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonDepartmentProperty)
         }
         set {
-            setSingleValueProperty(kABPersonDepartmentProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonDepartmentProperty, value)
         }
     }
     
@@ -515,7 +527,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonNoteProperty)
         }
         set {
-            setSingleValueProperty(kABPersonNoteProperty, NSString(string: newValue))
+            let value: AnyObject = newValue ?? ""
+            setSingleValueProperty(kABPersonNoteProperty, value)
         }
     }
     
@@ -949,16 +962,15 @@ private func convertRecordsToPersons(records : [ABRecord]?) -> [SwiftAddressBook
 
 
 //MARK: some more handy methods
-
-extension NSString {
-    convenience init?(string : String?) {
-        if string == nil {
-            self.init()
-            return nil
-        }
-        self.init(string: string!)
-    }
-}
+//extension NSString {
+//    convenience init?(string : String?) {
+//        if string == nil {
+//            self.init()
+//            return nil
+//        }
+//        self.init(string: string!)
+//    }
+//}
 
 func errorIfNoSuccess(call : (UnsafeMutablePointer<Unmanaged<CFError>?>) -> Bool) -> CFError? {
     var err : Unmanaged<CFError>? = nil

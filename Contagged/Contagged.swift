@@ -8,7 +8,6 @@ import AddressBook
 import AddressBookUI
 import UIKit
 
-
 protocol ContaggedPickerDelegate {
     func peoplePickerNavigationControllerDidCancel()
     func personSelected(person: SwiftAddressBookPerson!)
@@ -24,7 +23,6 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     var unknownPersonDelegate : ContaggedUnknownPersonDelegate?
     var viewController : UIViewController?
     
-    
     // MARK: Authorization Methods
     func getAuthorizationStatus() -> ABAuthorizationStatus {
         return SwiftAddressBook.authorizationStatus()
@@ -33,8 +31,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     func requestAuthorizationWithCompletion(completion: (Bool, CFError?) -> Void ) {
         swiftAddressBook?.requestAccessWithCompletion(completion)
     }
-    
-    
+
     // MARK: People Picker Methods
     func pickContact(fieldName: String) -> Void {
         let picker = ABPeoplePickerNavigationController()
@@ -64,21 +61,18 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
         pickerDelegate?.peoplePickerNavigationControllerDidCancel();
     }
     
-    
-    
     // MARK: Unknown Person Methods
     func addUnknownContact(fieldName: String, value: String) -> Void {
-        let unk = ABUnknownPersonViewController()
-        unk.allowsAddingToAddressBook = true
-        unk.allowsActions = false // user can tap an email address to switch to mail, for example
+        let unknownPersonViewController = ABUnknownPersonViewController()
+        unknownPersonViewController.unknownPersonViewDelegate = self
+        unknownPersonViewController.allowsAddingToAddressBook = true
+        unknownPersonViewController.allowsActions = false // user can tap an email address to switch to mail, for example
         
         let person : SwiftAddressBookPerson = SwiftAddressBookPerson.create()
-        
         addFieldToContact(fieldName, value: value, person: person)
+        unknownPersonViewController.displayedPerson = person
         
-        unk.displayedPerson = person
-        unk.unknownPersonViewDelegate = self
-        viewController?.showViewController(unk, sender:viewController?) // push onto navigation controller
+        viewController?.showViewController(unknownPersonViewController, sender:viewController?) // push onto navigation controller
     }
     
     func unknownPersonViewController(
@@ -86,8 +80,6 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
         didResolveToPerson person: ABRecord!) {
             unknownPersonDelegate?.didResolveToPerson(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
     }
-    
-    
     
     // MARK: General access methods
     /**
