@@ -237,6 +237,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         var messageText = NSString(data: message, encoding: NSUTF8StringEncoding)!
         var messagePublicKey = NSString(data: pubKey, encoding: NSUTF8StringEncoding)!
+        var messagePubKeyB64 = pubKey.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.allZeros)
         var messagesForPubKey : [Message] = []
         if (self.contacts.containsObject(messagePublicKey)) {
             messagesForPubKey = self.messages[messagePublicKey] as [Message]
@@ -251,7 +252,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         if let moc = self.managedObjectContext {
             Message.createInManagedObjectContext(moc,
-                peer: contaggedManager.getPeerName("pubkey", value: messagePublicKey), //TODO
+                peer: contaggedManager.getPeerName("pubkey", value: messagePubKeyB64), //TODO
                 publicKey: messagePublicKey,
                 text: messageText,
                 outgoing: false,
