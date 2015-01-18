@@ -15,7 +15,6 @@ https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2)
 import UIKit
 
 // MARK: Message
-
 class LGChatMessage : NSObject {
     
     enum SentBy : String {
@@ -82,7 +81,6 @@ class LGChatMessage : NSObject {
 }
 
 // MARK: Message Cell
-
 class LGChatMessageCell : UITableViewCell {
     
     // MARK: Global MessageCell Appearance Modifier
@@ -214,13 +212,12 @@ class LGChatMessageCell : UITableViewCell {
 }
 
 // MARK: Chat Controller
-
 @objc protocol LGChatControllerDelegate {
     optional func shouldChatController(chatController: LGChatController, addMessage message: LGChatMessage) -> Bool
     optional func chatController(chatController: LGChatController, didAddNewMessage message: LGChatMessage)
 }
 
-class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataSource, LGChatInputDelegate, UINavigationBarDelegate, ContaggedUnknownPersonDelegate, ContaggedPickerDelegate{
+class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, LGChatInputDelegate, UINavigationBarDelegate, ContaggedUnknownPersonDelegate, ContaggedPickerDelegate{
     
     // MARK: Constants
     private struct Constants {
@@ -231,13 +228,17 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     let kPubKeyField = "pubkey"
     
     // MARK: Public Properties
-    
     /*!
     Use this to set the messages to be displayed
     */
     var messages: [LGChatMessage] = []
     var opponentImage: UIImage?
-    var peer : String?
+    var peer : String? {
+        didSet{
+            isNewMessage = false;
+            setup();
+        }
+    }
     var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
     
@@ -249,10 +250,16 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     private let chatInput = LGChatInput()
     private var bottomChatInputConstraint: NSLayoutConstraint!
     private let contaggedManager: ContaggedManager = ContaggedManager();
+    
+    
+    //MARK: UITextViewDelegate
+    func textFieldDidBeginEditing(textField: UITextField!) {
+        getContact()
+    }
 
     // MARK: ContaggedUnknownPersonDelegate
     func didResolveToPerson(person: SwiftAddressBookPerson!){
-        println(person.firstName)
+        println(ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue())
     }
     
     // MARK: ContaggedPickerDelegate
@@ -261,7 +268,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     func personSelected(person: SwiftAddressBookPerson!){
-        println(person.firstName)
+        peer = ABRecordCopyCompositeName(person.internalRecord).takeRetainedValue();
     }
     
     // MARK: Life Cycle
@@ -322,7 +329,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         }
         
         // Create left and right button for navigation item
-        let rightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "getContact")
+        let rightButton = UIBarButtonItem(title: "New Contact", style:UIBarButtonItemStyle.Bordered, target: self, action: "addNewContact")
         let leftButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action:"dismissSelf")
         
         // Create two buttons for the navigation item
@@ -338,7 +345,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         self.view.addSubview(navBar)
     }
     
-    public func getContact() {
+    func getContact() {
         contaggedManager.pickContact(kPubKeyField)
     }
     
@@ -352,6 +359,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         toField.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.05)
         toField.actionsForTarget("toggleToFieldExists", forControlEvent: UIControlEvents.AllEditingEvents)
         self.view.addSubview(toField)
+        toField.delegate = self
     }
     
 //    public func toggleToFieldExists() {
@@ -463,7 +471,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     // MARK: iOS 7 Compatibility Keyboard Animations
-    
     func keyboardWillShow(note: NSNotification) {
         let keyboardAnimationDetail = note.userInfo!
         let duration = keyboardAnimationDetail[UIKeyboardAnimationDurationUserInfoKey] as NSTimeInterval
@@ -502,7 +509,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     // MARK: Rotation
-    
     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         super.willAnimateRotationToInterfaceOrientation(toInterfaceOrientation, duration: duration)
         self.tableView.reloadData()
@@ -515,7 +521,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     // MARK: Scrolling
-    
     private func scrollToBottom() {
         if messages.count > 0 {
             var lastItemIdx = self.tableView.numberOfRowsInSection(Constants.MessagesSection) - 1
@@ -528,7 +533,6 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     // MARK: New messages
-    
     func addNewMessage(message: LGChatMessage) {
         messages += [message]
         tableView.reloadData()
@@ -926,15 +930,3 @@ class LGStretchyTextView : UITextView, UITextViewDelegate {
         self.isValid = countElements(textView.text) > 0
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
