@@ -10,7 +10,7 @@
 
 @interface JsonOps : NSObject
 
-+ (NSDictionary *) jsonFromData:(NSData *) data;
++ (NSMutableDictionary *) jsonFromData:(NSData *) data;
 + (NSData *) dataFromJson:(NSDictionary *) dict;
 
 @end

@@ -20,7 +20,7 @@
     return nil;
 }
 
-+ (NSData *) dataFromJson:(NSMutableDictionary *) dict
++ (NSData *) dataFromJson:(NSDictionary *) dict
 {
     NSError *error;
     if ([NSJSONSerialization isValidJSONObject:dict]) {
