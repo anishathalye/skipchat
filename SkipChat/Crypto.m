@@ -39,8 +39,10 @@
 {
     static BOOL seeded = NO;
     if (!seeded) {
+        NSLog(@"Seeding RNG");
         uint8_t bytes[RNG_SEED_BYTES];
         SecRandomCopyBytes(kSecRandomDefault, RNG_SEED_BYTES, bytes);
+        NSLog(@"%@", [NSData dataWithBytes:bytes length:RNG_SEED_BYTES]);
         RAND_seed(bytes, RNG_SEED_BYTES);
         seeded = YES;
     }
