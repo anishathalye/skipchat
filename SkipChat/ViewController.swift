@@ -242,7 +242,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             messagesForPubKey = self.messages[messagePublicKey] as [Message]
         }
         for message in messagesForPubKey {
-            if message.text == messageText && message.contactDate == time {
+            bool sameTime = message.contactDate.compare(time) == NSComparisonResult.NSOrderedSame
+            bool sameMsg = messageText.isEqualToString(message.text)
+            if sameMsg && sameTime {
+                println("skipping duplicate message")
                 return
             }
         }
