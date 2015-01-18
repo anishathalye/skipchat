@@ -92,7 +92,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         // Create left and right button for navigation item
         //        let leftButton = UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
-        let rightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: nil)
+        let rightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: "composeNewMessage")
         
         // Create two buttons for the navigation item
         //        navigationItem.leftBarButtonItem = leftButton
@@ -104,7 +104,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         self.view.addSubview(navBar)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -154,11 +154,26 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 //        self.presentViewController(ComposeViewController(), animated: true, completion: nil)
         let chatController = LGChatController()
         chatController.opponentImage = UIImage(named: "User")
-        chatController.title = "Simple Chat"
-        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
-        chatController.messages = [helloWorld]
+        chatController.messages = getMessages()
+        chatController.peer = self.messages[indexPath.row].peer
         chatController.delegate = self
+        self.messageTable.deselectRowAtIndexPath(indexPath, animated: true)
         self.presentViewController(chatController, animated: true, completion: nil)
+    }
+    
+    public func composeNewMessage() {
+        let chatController = LGChatController()
+        chatController.opponentImage = UIImage(named: "User")
+        chatController.messages = getMessages()
+        chatController.delegate = self
+        chatController.isNewMessage = true 
+        self.presentViewController(chatController, animated: true, completion: nil)
+    }
+
+    
+    func getMessages() -> [LGChatMessage] {
+        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
+        return [helloWorld]
     }
     
     // LGChatControllerDelegate

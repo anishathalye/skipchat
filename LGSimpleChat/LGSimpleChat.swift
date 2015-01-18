@@ -236,6 +236,8 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     */
     var messages: [LGChatMessage] = []
     var opponentImage: UIImage?
+    var peer : String?
+    var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
     
     // MARK: Private Properties
@@ -243,6 +245,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     private let sizingCell = LGChatMessageCell()
     private let tableView: UITableView = UITableView()
     private let navBar: UINavigationBar = UINavigationBar()
+    private let toField: UITextField = UITextField()
     private let chatInput = LGChatInput()
     private var bottomChatInputConstraint: NSLayoutConstraint!
     
@@ -282,6 +285,9 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     private func setup() {
         self.setupTableView()
         self.setupNavView()
+        if self.isNewMessage {
+            self.setupToFieldView()
+        }
         self.setupChatInput()
         self.setupLayoutConstraints()
     }
@@ -292,10 +298,16 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         // Create a navigation item with a title
         let navigationItem = UINavigationItem()
         
-        navigationItem.title = "SkipChat"
+        if !self.isNewMessage {
+            navigationItem.title = peer
+        } else {
+            navigationItem.title = "New Message"
+        }
         
         // Create left and right button for navigation item
-        let leftButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
+//        let leftButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: self, action: @selector(self.dismissSelf))
+        
+        let leftButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action:"dismissSelf")
         
         // Create two buttons for the navigation item
         navigationItem.leftBarButtonItem = leftButton
@@ -304,6 +316,16 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         navBar.items = [navigationItem]
         
         self.view.addSubview(navBar)
+    }
+    
+    private func setupToFieldView() {
+        toField.frame = CGRectMake(0, 64, self.view.frame.width, 50)
+        toField.backgroundColor = UIColor.whiteColor()
+        self.view.addSubview(toField)
+    }
+    
+    public func dismissSelf() {
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     private func setupTableView() {
@@ -340,8 +362,11 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     private func tableViewConstraints() -> [NSLayoutConstraint] {
         let leftConstraint = NSLayoutConstraint(item: tableView, attribute: .Left, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1.0, constant: 0.0)
         let rightConstraint = NSLayoutConstraint(item: tableView, attribute: .Right, relatedBy: .Equal, toItem: self.view, attribute: .Right, multiplier: 1.0, constant: 0.0)
-        let topConstraint = NSLayoutConstraint(item: tableView, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 64)
-        println(topConstraint)
+        var topConst = NSLayoutConstraint(item: tableView, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 64)
+        if isNewMessage {
+            topConst = NSLayoutConstraint(item: tableView, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 114)
+        }
+        let topConstraint = topConst
         let bottomConstraint = NSLayoutConstraint(item: tableView, attribute: .Bottom, relatedBy: .Equal, toItem: chatInput, attribute: .Top, multiplier: 1.0, constant: 0)
         return [rightConstraint, leftConstraint, topConstraint, bottomConstraint]
     }
