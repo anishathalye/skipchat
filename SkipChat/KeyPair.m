@@ -10,4 +10,12 @@
 
 @implementation KeyPair
 
++ (KeyPair *) fromPublicKey:(NSData *) publicKey andPrivateKey:(NSData *) privateKey
+{
+    KeyPair *pair = [[KeyPair alloc] init];
+    pair.privateKey = privateKey;
+    pair.publicKey = publicKey;
+    return pair;
+}
+
 @end
