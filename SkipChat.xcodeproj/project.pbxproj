@@ -19,6 +19,8 @@
 		150DD71E1A6B48F10082F6B1 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */; };
 		F86060ED1A6B24F60055EC94 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EB1A6B24F60055EC94 /* libcrypto.a */; };
 		F86060EE1A6B24F60055EC94 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F86060EC1A6B24F60055EC94 /* libssl.a */; };
+		F8947D9F1A6B5BF600914F95 /* Contagged.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8947D9D1A6B5BF600914F95 /* Contagged.swift */; };
+		F8947DA01A6B5BF600914F95 /* SwiftAddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8947D9E1A6B5BF600914F95 /* SwiftAddressBook.swift */; };
 		F8B984D91A6B5B39003AB68A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DD7181A6B16460082F6B1 /* Message.swift */; };
 		F8E91FC11A6B35A500AACDC2 /* Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = F8E91FC01A6B35A500AACDC2 /* Crypto.m */; };
 		F8E91FC51A6B360A00AACDC2 /* KeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = F8E91FC41A6B360A00AACDC2 /* KeyPair.m */; };
@@ -101,6 +103,8 @@
 		150DD71D1A6B48F10082F6B1 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
 		F86060EB1A6B24F60055EC94 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = lib/libcrypto.a; sourceTree = "<group>"; };
 		F86060EC1A6B24F60055EC94 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = lib/libssl.a; sourceTree = "<group>"; };
+		F8947D9D1A6B5BF600914F95 /* Contagged.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contagged.swift; sourceTree = "<group>"; };
+		F8947D9E1A6B5BF600914F95 /* SwiftAddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftAddressBook.swift; sourceTree = "<group>"; };
 		F8E91FBF1A6B35A500AACDC2 /* Crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
 		F8E91FC01A6B35A500AACDC2 /* Crypto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Crypto.m; sourceTree = "<group>"; };
 		F8E91FC31A6B360A00AACDC2 /* KeyPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyPair.h; sourceTree = "<group>"; };
@@ -237,6 +241,7 @@
 		150DD6D51A6A29DD0082F6B1 = {
 			isa = PBXGroup;
 			children = (
+				F8947D9C1A6B5BF600914F95 /* Contagged */,
 				150DD71A1A6B326A0082F6B1 /* Views */,
 				150DD7121A6B15DA0082F6B1 /* Models */,
 				F8E922711A6B594300AACDC2 /* JSQSystemSoundPlayer */,
@@ -336,6 +341,15 @@
 				F86060EC1A6B24F60055EC94 /* libssl.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F8947D9C1A6B5BF600914F95 /* Contagged */ = {
+			isa = PBXGroup;
+			children = (
+				F8947D9D1A6B5BF600914F95 /* Contagged.swift */,
+				F8947D9E1A6B5BF600914F95 /* SwiftAddressBook.swift */,
+			);
+			path = Contagged;
 			sourceTree = "<group>";
 		};
 		F8E91FC21A6B35F600AACDC2 /* Crypto */ = {
@@ -664,6 +678,7 @@
 				F8E9225F1A6B58E700AACDC2 /* JSQVideoMediaItem.m in Sources */,
 				F8E9224B1A6B58E700AACDC2 /* UIDevice+JSQMessages.m in Sources */,
 				F8E922651A6B58E700AACDC2 /* JSQMessagesCollectionViewCellOutgoing.m in Sources */,
+				F8947D9F1A6B5BF600914F95 /* Contagged.swift in Sources */,
 				F8E9226C1A6B58E700AACDC2 /* JSQMessagesMediaPlaceholderView.m in Sources */,
 				F8E9224E1A6B58E700AACDC2 /* JSQMessagesKeyboardController.m in Sources */,
 				F8E922541A6B58E700AACDC2 /* JSQMessagesTimestampFormatter.m in Sources */,
@@ -682,6 +697,7 @@
 				F8E922631A6B58E700AACDC2 /* JSQMessagesCollectionViewCellIncoming.m in Sources */,
 				F8E9224C1A6B58E700AACDC2 /* UIImage+JSQMessages.m in Sources */,
 				F8E922531A6B58E700AACDC2 /* JSQMessagesMediaViewBubbleImageMasker.m in Sources */,
+				F8947DA01A6B5BF600914F95 /* SwiftAddressBook.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
