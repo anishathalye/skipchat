@@ -306,17 +306,21 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         }
         
         // Create left and right button for navigation item
-//        let leftButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: self, action: @selector(self.dismissSelf))
-        
+        let rightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "getContact")
         let leftButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action:"dismissSelf")
         
         // Create two buttons for the navigation item
+        navigationItem.rightBarButtonItem = rightButton
         navigationItem.leftBarButtonItem = leftButton
         
         // Assign the navigation item to the navigation bar
         navBar.items = [navigationItem]
         
         self.view.addSubview(navBar)
+    }
+    
+    public func getContact() {
+        // TODO(ankush)
     }
     
     private func setupToFieldView() {
@@ -327,8 +331,18 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
         self.view.addSubview(paddingView)
         toField.frame = CGRectMake(40, 64, self.view.frame.width, 50)
         toField.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.05)
+        toField.actionsForTarget("toggleToFieldExists", forControlEvent: UIControlEvents.AllEditingEvents)
         self.view.addSubview(toField)
     }
+    
+//    public func toggleToFieldExists() {
+//        println("number of elements ")
+//        if countElements(toField.text) > 0 {
+//            chatInput.hasCustomDestination = true
+//        } else {
+//            chatInput.hasCustomDestination = false
+//        }
+//    }
     
     public func dismissSelf() {
         self.dismissViewControllerAnimated(true, completion: nil)
@@ -347,6 +361,9 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     
     private func setupChatInput() {
         chatInput.delegate = self
+        if (self.isNewMessage) {
+            chatInput.isNewMessage = true
+        }
         self.view.addSubview(chatInput)
     }
     
@@ -604,6 +621,8 @@ class LGChatInput : UIView, LGStretchyTextViewDelegate {
     // MARK: Public Properties
     
     var textViewInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+    var isNewMessage : Bool = false
+    var hasCustomDestination : Bool = false
     weak var delegate: LGChatInputDelegate?
     
     // MARK: Private Properties
@@ -729,7 +748,7 @@ class LGChatInput : UIView, LGStretchyTextViewDelegate {
     // MARK: Button Presses
     
     func sendButtonPressed(sender: UIButton) {
-        if countElements(self.textView.text) > 0 {
+        if countElements(self.textView.text) > 0 { // && (!self.isNewMessage || self.hasCustomDestination) {
             self.delegate?.chatInput(self, didSendMessage: self.textView.text)
             self.textView.text = ""
         }
