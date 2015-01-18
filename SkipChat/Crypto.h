@@ -17,9 +17,8 @@
              with:(KeyPair *) keyPair
     andEncryptFor:(NSData *) publicKey;
 
-+ (BOOL) decrypt:(NSData *) blob
-            with:(KeyPair *) keyPair
-            into:(NSData **) buffer
-            from:(NSData **) publicKey
-              at:(NSDate **) date;
++ (NSData *) decrypt:(NSData *) blob
+                with:(KeyPair *) keyPair
+                from:(NSData **) publicKey
+                  at:(NSDate **) date;
 @end

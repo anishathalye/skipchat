@@ -219,9 +219,8 @@
         return NO; \
     }
 
-+ (BOOL) decrypt:(NSData *) blob
++ (NSData *) decrypt:(NSData *) blob
             with:(KeyPair *) keyPair
-            into:(NSData **) buffer
             from:(NSData **) publicKey
               at:(NSDate **) date
 {
@@ -241,7 +240,7 @@
     int bufLength;
     if ((bufLength = RSA_private_decrypt(encryptedKey.length, encryptedKey.bytes, buf, rsaPrivateKey, RSA_PKCS1_PADDING)) < 0) {
         NSLog(@"Failed to decrypt symmetric key");
-        return NO;
+        return nil;
     }
     NSData *keyData = [NSData dataWithBytes:buf length:bufLength];
     free(buf);
@@ -258,15 +257,15 @@
     EVP_CIPHER_CTX_init(&ctx);
     if (EVP_DecryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, key.bytes, iv.bytes) != 1) {
         NSLog(@"Decrypt init failed");
-        return NO;
+        return nil;
     }
     if (EVP_DecryptUpdate(&ctx, buf, &outLength1, encryptedSymmetric.bytes, encryptedSymmetric.length) != 1) {
         NSLog(@"Decrypt update failed");
-        return NO;
+        return nil;
     }
     if (EVP_DecryptFinal_ex(&ctx, buf + outLength1, &outLength2) != 1) {
         NSLog(@"Decrypt final failed");
-        return NO;
+        return nil;
     }
     EVP_CIPHER_CTX_cleanup(&ctx);
     NSData *symmetric = [NSData dataWithBytes:buf length:(outLength1 + outLength2)];
@@ -285,12 +284,12 @@
     RSA *rsaPublicKey = PEM_read_bio_RSAPublicKey(bio, NULL, NULL, NULL);
     if (rsaPublicKey == NULL) {
         NSLog(@"Error extracting sender public key");
-        return NO;
+        return nil;
     }
     BIO_free_all(bio);
     if (RSA_verify(NID_sha256, hash, SHA256_DIGEST_LENGTH, signature.bytes, signature.length, rsaPublicKey) != 1) {
         NSLog(@"Error validating signature");
-        return NO;
+        return nil;
     }
     RSA_free(rsaPublicKey);
 
@@ -298,7 +297,7 @@
     DECODE_OR_DIE(targetPublic, @"public_key", chunk);
     if (![targetPublic isEqualToData:keyPair.publicKey]) {
         NSLog(@"Mismatched recipient (malicious forwarding?)");
-        return NO;
+        return nil;
     }
 
     DECODE_OR_DIE(message, @"message", chunk);
@@ -308,18 +307,15 @@
         NSDate *time = [self dateFromString:timestamp];
         if (time == nil) {
             NSLog(@"Error extracting timestamp");
-            return NO;
+            return nil;
         }
         *date = time;
-    }
-    if (buffer != nil) {
-        *buffer = message;
     }
     if (publicKey != nil) {
         *publicKey = senderPublic;
     }
 
-    return YES;
+    return message;
 }
 
 @end
