@@ -10,7 +10,7 @@ import UIKit
 
 protocol ContaggedPickerDelegate {
     func peoplePickerNavigationControllerDidCancel()
-    func personSelected(person: SwiftAddressBookPerson!)
+    func personSelected(person: SwiftAddressBookPerson!, fieldValue: String?)
 }
 
 protocol ContaggedUnknownPersonDelegate {
@@ -22,6 +22,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     var pickerDelegate : ContaggedPickerDelegate?
     var unknownPersonDelegate : ContaggedUnknownPersonDelegate?
     var viewController : UIViewController?
+    var pickerField : String?
     
     // MARK: Authorization Methods
     class func getAuthorizationStatus() -> ABAuthorizationStatus {
@@ -34,12 +35,12 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
 
     // MARK: People Picker Methods
     func pickContact(fieldName: String) -> Void {
+        pickerField = fieldName;
         let picker = ABPeoplePickerNavigationController()
         picker.peoplePickerDelegate = self
         
         if picker.respondsToSelector(Selector("predicateForEnablingPerson")) {
-            // urls.filter({$0.label == fieldName}).count > 0
-            picker.predicateForEnablingPerson = NSPredicate(format: "ANY urls.fieldName = %@", fieldName)
+            picker.predicateForEnablingPerson = NSPredicate(format: "SUBQUERY(%K, $url, $url.label = %@).@count > 0", ABPersonUrlAddressesProperty, fieldName)
         }
         
         viewController?.presentViewController(picker, animated: true, completion: nil)
@@ -47,7 +48,9 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!,
         didSelectPerson person: ABRecordRef!) {
-        pickerDelegate?.personSelected(swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person)))
+            let person = swiftAddressBook?.personWithRecordId(ABRecordGetRecordID(person))
+            let values = findValueForPerson(pickerField!, person: person!)
+            pickerDelegate?.personSelected(person, fieldValue: values?.first?.value)
     }
     
     func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController!, shouldContinueAfterSelectingPerson person: ABRecordRef!) -> Bool {

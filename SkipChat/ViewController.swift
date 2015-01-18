@@ -9,21 +9,19 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate, LGChatControllerDelegate, ContaggedUnknownPersonDelegate, ContaggedPickerDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PtoPProtocolDelegate, UINavigationBarDelegate, LGChatControllerDelegate {
     let IOS_BAR_HEIGHT : Float = 20.0
     let ROWS_PER_SCREEN : Float = 8.0
     let NAV_BAR_HEIGHT : Float = 64.0
     var networkingLayer : PtoPProtocol!
     var messageTable = UITableView(frame: CGRectZero, style: .Plain)
     var navBar : UINavigationBar = UINavigationBar(frame: CGRectZero)
-    var messages : [Message]!
+    var messages : NSMutableDictionary = NSMutableDictionary()
+    var contacts : NSMutableArray = NSMutableArray()
     let contaggedManager : ContaggedManager = ContaggedManager();
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        contaggedManager.viewController = self
-        contaggedManager.unknownPersonDelegate = self
-        contaggedManager.pickerDelegate = self
     }
     
     lazy var managedObjectContext : NSManagedObjectContext? = {
@@ -39,26 +37,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        self.networkingLayer = PtoPProtocol(prKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!, pubKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
-        self.networkingLayer?.send("asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, recipient: "asdf".dataUsingEncoding(NSUTF8StringEncoding)!)
-        println(managedObjectContext!)
-        
-//        self.messageTable = UITableView(frame: self.view.bounds, style: UITableViewStyle.Plain)
-//        self.messageTable.dataSource = self;
-//        self.messageTable.delegate = self;
-//        self.view.addSubview(self.messageTable)
-        
-        // dummy data
-        if let moc = self.managedObjectContext {
-            Message.createInManagedObjectContext(moc,
-                peer: "Anish",
-                text: "hello world",
-                outgoing: true)
-        }
+        self.networkingLayer = PtoPProtocol.sharedInstance
+        self.networkingLayer.delegate = self
         
         fetchMessages()
-        
         
         // Store the full frame in a temporary variable
         var viewFrame = self.view.frame
@@ -118,23 +100,38 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         // Create a sort descriptor object that sorts on the "title"
         // property of the Core Data object
-//        let sortDescriptor = NSSortDescriptor(key: "lastDate", ascending: true) TODO
+        let sortDescriptor = NSSortDescriptor(key: "contactDate", ascending: true)
         
         // Set the list of sort descriptors in the fetch request,
         // so it includes the sort descriptor
-//        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.sortDescriptors = [sortDescriptor]
         
+        messages = NSMutableDictionary()
+        contacts = NSMutableArray()
         if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [Message] {
-            messages = fetchResults
+            var allMessages = fetchResults
+            for message in allMessages {
+                var personMessages = NSMutableArray()
+                if (messages.objectForKey(message.publicKey) != nil) {
+                    personMessages = messages.objectForKey(message.publicKey) as NSMutableArray
+                } else {
+                    self.contacts.addObject(message.publicKey)
+                }
+                personMessages.addObject(message)
+                messages.setObject(personMessages, forKey: message.publicKey)
+            }
         }
+        
+        self.messageTable.reloadData()
     }
 
     // UITableViewDataSource
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MessageCell") as MessageTableViewCell
         
-        // Get the LogItem for this index
-        let messageItem = messages[indexPath.row]
+        // Get the message for this index
+        let messageItems = messages[contacts[indexPath.row] as String] as [Message]
+        let messageItem = messageItems[messageItems.count-1]
         
         // Set the title of the cell to be the title of the logItem
         cell.messagePeerLabel.text = messageItem.peer
@@ -144,39 +141,56 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count;
+        return contacts.count;
     }
     
     // UITableViewDelegate
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return CGFloat((Float(self.view.frame.size.height) - IOS_BAR_HEIGHT) / ROWS_PER_SCREEN)
+        return 80
+    }
+    
+    func getMessagesForPublicKey(publicKey : String) -> [LGChatMessage] {
+        var userMessages = self.messages[publicKey] as [Message]
+        return makeLGMessages(userMessages)
+    }
+    
+    func getEarliestMessageForPublicKey(publicKey : String) -> Message {
+        return (self.messages[publicKey] as [Message])[0]
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("pushing new controller")
-//        self.presentViewController(ComposeViewController(), animated: true, completion: nil)
         let chatController = LGChatController()
-        chatController.opponentImage = UIImage(named: "User")
-        chatController.messages = getMessages()
-        chatController.peer = self.messages[indexPath.row].peer
+//        chatController.opponentImage = UIImage(named: "User")
+        chatController.messages = getMessagesForPublicKey(contacts[indexPath.row] as String) as [LGChatMessage]
+        let earliestMessage = getEarliestMessageForPublicKey(contacts[indexPath.row] as String) as Message
+        chatController.peer = earliestMessage.peer
+        chatController.peerPublicKey = earliestMessage.publicKey
+        chatController.rootView = self
         chatController.delegate = self
         self.messageTable.deselectRowAtIndexPath(indexPath, animated: true)
         self.presentViewController(chatController, animated: true, completion: nil)
     }
     
-    public func composeNewMessage() {
+    internal func composeNewMessage() {
         let chatController = LGChatController()
-        chatController.opponentImage = UIImage(named: "User")
-        chatController.messages = getMessages()
+//        chatController.opponentImage = UIImage(named: "User")
         chatController.delegate = self
-        chatController.isNewMessage = true 
+        chatController.isNewMessage = true
+        chatController.rootView = self
         self.presentViewController(chatController, animated: true, completion: nil)
     }
 
-    
-    func getMessages() -> [LGChatMessage] {
-//        let helloWorld = LGChatMessage(content: "Hello World!", sentBy: .User)
-        return []//[helloWorld]
+    func makeLGMessages(userMessages : [Message]) -> [LGChatMessage] {
+        var lgMessages : [LGChatMessage] = []
+        for message in userMessages {
+            var sender = LGChatMessage.SentBy.User
+            if message.outgoing == false {
+                sender = LGChatMessage.SentBy.Opponent
+            }
+            lgMessages.append(LGChatMessage(content: message.text, sentBy: sender))
+        }
+        return lgMessages
     }
     
     // LGChatControllerDelegate
@@ -194,20 +208,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // PtPProtocolDelegate
     func receive(message : NSData, pubKey : NSData, time : NSDate) {
         println("received message on frontend")
-    }
-    
-    // ContaggedUnknownPersonDelegate
-    func didResolveToPerson(person: SwiftAddressBookPerson!){
-        println(person.firstName)
-    }
-    
-    // ContaggedPickerDelegate
-    func peoplePickerNavigationControllerDidCancel(){
         
-    }
-    
-    func personSelected(person: SwiftAddressBookPerson!){
-        println(person.firstName)
+        var messageText : String = NSString(data: message, encoding: NSUTF8StringEncoding) as String
+        var publicKey : String = NSString(data: pubKey, encoding: NSUTF8StringEncoding) as String
+        var messagesForPubKey = self.messages[pubKey] as [Message]
+        for message in messagesForPubKey {
+            if message.text == messageText && message.contactDate == time {
+                return
+            }
+        }
+        if let moc = self.managedObjectContext {
+            Message.createInManagedObjectContext(moc,
+                peer: "asdf", //TODO
+                publicKey: publicKey,
+                text: messageText,
+                outgoing: false,
+                contactDate: time
+            )
+        }
+        var error : NSError? = nil
+        if !self.managedObjectContext!.save(&error) {
+            NSLog("Unresolved error \(error), \(error!.userInfo)")
+            abort()
+        }
+        self.fetchMessages()
     }
 }
 
