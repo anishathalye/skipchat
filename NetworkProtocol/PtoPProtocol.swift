@@ -177,6 +177,11 @@ public class PtoPProtocol: NSObject, MCSessionDelegate, MCNearbyServiceAdvertise
         var time: NSDate?
         if let decrypted = Crypto.decrypt(packet.blob, with: self.keyPair, from: &from, at: &time) {
             println("Received message")
+            if let delegate = self.delegate? {
+                dispatch_async(dispatch_get_main_queue()) {
+                    delegate.receive(decrypted, pubKey: from!, time: time!)
+                }
+            }
         } else {
             if packet.decrementTTL() {
                 if !inBuffer(packet) {
