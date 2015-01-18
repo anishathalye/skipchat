@@ -251,6 +251,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
     var peerPublicKey : String?
     var isNewMessage : Bool = false
     weak var delegate: LGChatControllerDelegate?
+    var rootView : ViewController?
     
     // MARK: Private Properties
     
@@ -357,6 +358,7 @@ class LGChatController : UIViewController, UITableViewDelegate, UITableViewDataS
 //    }
     
     public func dismissSelf() {
+        self.rootView?.fetchMessages()
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     

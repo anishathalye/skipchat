@@ -112,6 +112,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // so it includes the sort descriptor
         fetchRequest.sortDescriptors = [sortDescriptor]
         
+        messages = NSMutableDictionary()
+        contacts = NSMutableArray()
         if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [Message] {
             var allMessages = fetchResults
             for message in allMessages {
@@ -125,6 +127,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 messages.setObject(personMessages, forKey: message.peer)
             }
         }
+        
+        self.messageTable.reloadData()
     }
 
     // UITableViewDataSource
@@ -159,6 +163,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         chatController.messages = makeLGMessages(userMessages)
         chatController.peer = userMessages[0].peer
         chatController.peerPublicKey = userMessages[0].publicKey
+        chatController.rootView = self
         chatController.delegate = self
         self.messageTable.deselectRowAtIndexPath(indexPath, animated: true)
         self.presentViewController(chatController, animated: true, completion: nil)
@@ -169,6 +174,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 //        chatController.opponentImage = UIImage(named: "User")
         chatController.delegate = self
         chatController.isNewMessage = true
+        chatController.rootView = self
         self.presentViewController(chatController, animated: true, completion: nil)
     }
 
