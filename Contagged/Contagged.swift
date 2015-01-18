@@ -38,8 +38,7 @@ class ContaggedManager: NSObject, ABPeoplePickerNavigationControllerDelegate, AB
         picker.peoplePickerDelegate = self
         
         if picker.respondsToSelector(Selector("predicateForEnablingPerson")) {
-            // urls.filter({$0.label == fieldName}).count > 0
-            picker.predicateForEnablingPerson = NSPredicate(format: "ANY urls.fieldName = %@", fieldName)
+            picker.predicateForEnablingPerson = NSPredicate(format: "SUBQUERY(%K, $url, $url.label = %@).@count > 0", ABPersonUrlAddressesProperty, fieldName)
         }
         
         viewController?.presentViewController(picker, animated: true, completion: nil)
