@@ -20,11 +20,13 @@
     return nil;
 }
 
-+ (NSData *) dataFromJson:(NSMutableDictionary *) dict
++ (NSData *) dataFromJson:(NSDictionary *) dict
 {
     NSError *error;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&error];
-    return data;
+    if ([NSJSONSerialization isValidJSONObject:dict]) {
+        return [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&error];
+    }
+    return nil;
 }
 
 @end
