@@ -2,7 +2,7 @@
 //  SimpleChatController.swift
 //  SimpleChat
 //
-//  Created by Logan Wright on 10/16/14.
+//  Created by Logan Wright on 10/16/14. Modified for use in this project.
 //  Copyright (c) 2014 Logan Wright. All rights reserved.
 //
 
